@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.wxweven.domain">
+
+	<class name="User" table="wxw_user">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<property name="loginName" />
+		<property name="password" />
+		<property name="userState" />
+		<!-- 用户登录时间戳,需要配置type属性 -->
+		<property name="lastLoginTime" type="timestamp" />
+		<property name="realName" />
+		<property name="gender" />
+		<property name="phoneNumber" />
+		<property name="email" />
+		<property name="description" />
+
+		<!-- department属性，本类与Department的多对一 -->
+		<many-to-one name="department" class="Department" column="departmentId" />
+		
+		<!-- userGroup属性，本类与UserGroup的多对一 -->
+		<many-to-one name="userGroup" class="UserGroup" column="userGroupId" cascade="save-update"/>
+		
+	</class>
+
+</hibernate-mapping>

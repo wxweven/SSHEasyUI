@@ -1,0 +1,24 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+	"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+<session-factory>
+
+	<!-- 数据库信息（连接信息写到spring的配置文件中） -->
+
+	<!-- 其他配置 -->
+	<property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+	<property name="show_sql">true</property>
+	<property name="hibernate.format_sql">true</property>
+	<property name="hbm2ddl.auto">update</property>
+
+	<!-- 导入映射配置 -->
+	<mapping resource="com/wxweven/domain/Department.hbm.xml" />
+	<mapping resource="com/wxweven/domain/User.hbm.xml" />
+	<mapping resource="com/wxweven/domain/UserGroup.hbm.xml" />
+	<mapping resource="com/wxweven/domain/SysMenu.hbm.xml" />
+	<mapping resource="com/wxweven/domain/TestDomain.hbm.xml" />
+
+</session-factory>
+</hibernate-configuration>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.2.xsd
+           http://www.springframework.org/schema/aop 
+           http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+           http://www.springframework.org/schema/tx 
+           http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+
+	<!-- 文件说明： spring的基础配置，包括数据源，c3p0,SessionFactory,声明式事务等 -->
+	
+	<!-- 加载外部的jdbc.propertites配置文件 -->
+	<context:property-placeholder location="classpath:jdbc.properties" />
+
+	<!-- 用Bean定义数据源 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="${driverClass}" /> <!-- 定义数据库驱动 -->
+		<property name="jdbcUrl" value="${jdbcUrl}" /> <!-- 定义数据库URL -->
+		<property name="user" value="${user}" /> <!-- 定义数据库的用户名 -->
+		<property name="password" value="${password}" /> <!-- 定义数据库的密码 -->
+
+		<!-- c3p0连接其他配置 -->	
+		<property name="minPoolSize" value="1" />
+		<property name="maxPoolSize" value="40" />
+		<property name="maxIdleTime" value="1800" />
+		<property name="acquireIncrement" value="2" />
+		<property name="maxStatements" value="0" />
+		<property name="initialPoolSize" value="2" />
+		<property name="idleConnectionTestPeriod" value="1800" />
+		<property name="acquireRetryAttempts" value="30" />
+		<property name="acquireRetryDelay" value="100" />
+		<property name="breakAfterAcquireFailure" value="true" />
+		<property name="testConnectionOnCheckout" value="false" />
+	</bean>
+
+	<!-- 定义Hibernate的SessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" /> <!-- 定义SessionFactory必须注入dataSource -->
+		<property name="configLocation" value="classpath:hibernate.cfg.xml" /> <!-- 定义Hibernate的配置文件hibernate.cfg.xml -->
+	</bean>
+
+	<!-- 配置spring的声明式事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="save*" propagation="REQUIRED" /><!-- 只有一save、delete、update开头的方法才能执行增删改操作 -->
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="*" propagation="SUPPORTS" read-only="true" /><!-- 其他方法为只读方法,事务传播性定义为SUPPORTS -->
+			<tx:method name="*" isolation="READ_COMMITTED" />
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:config>
+		<aop:pointcut id="interceptorPointCuts" expression="execution(* com.wxweven.service..*.*(..))" />  <!-- 对应实现类接口的包的位置 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="interceptorPointCuts" />
+	</aop:config>
+
+</beans>
+

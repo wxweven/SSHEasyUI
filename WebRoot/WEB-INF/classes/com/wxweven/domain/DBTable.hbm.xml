@@ -1,0 +1,223 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.wxweven.domain">
+    <class name="Student" table="STUDENT">
+        <id name="studentid" type="string">
+            <column name="STUDENTID" />
+            <generator class="native" />
+        </id>
+        <property name="name" type="string">
+            <column name="NAME" />
+        </property>
+        <property name="gender" type="int">
+            <column name="GENDER" />
+        </property>
+        <property name="age" type="int">
+            <column name="AGE" />
+        </property>
+    </class>
+    
+    <!-- Customer类的映射 -->
+    <class name="Customer" table="customer">
+        <id name="cid" type="long" column="id">
+            <generator class="native" />
+        </id>
+        <property name="cname" type="string" column="NAME" />
+        
+        <!-- 从Customer到Order的一对多映射：一个Customer对应多个Order -->
+        <!-- inverse="true" 说明Customer 只关联Order的镜像
+        	当Customer和Order属性都变化时，只按照Order对象的变化来同步更新数据库-->
+        <set name="orders" cascade="save-update" inverse="true">
+        	<key column="customer_id" /><!-- 指定数据库中外键约束的字段 -->
+        	<one-to-many class="Order" /><!-- 指定 "多" 所对应的类 -->
+        </set>
+        
+        <!-- 集合映射之:Set映射 
+        	Customer到images的一对多值类型映射：images不像上述的Order(是个实体，有自己的映射),
+        	images只是个值类型，不对应一个实体类，但是数据库中有相应的表（关于实体类型和值类型，参见为知笔记）
+         -->
+         <set name="images" table="images" lazy="true">
+         	<key column="customer_id" />
+         	<element column="filename" type="string" not-null="true" />
+         </set>
+         
+         <!-- 组件集合映射：结合组件以及集合的映射
+         		Customer类有一个集合images，不同于上述的Set集合映射，这里的images集合装的是Image对象，
+         		（Set集合映射中，images装的只是String等简单类型），Image是Customer的组件
+         		所以，既有组件，又有集合，就是组件集合映射。集合可以使Set,List,Map等
+		 -->
+		 <set name="comImages" table="images" lazy="true" order-by="filename">
+		 	<key column="customer_id" />
+		 	<composite-element class="Image">
+		 		<parent name="customer" />
+		 		<property name="name" column="image_name" not-null="true" />
+		 		<property name="filename" column="filename" not-null="true" />
+		 	</composite-element>
+		 </set>
+         
+         <!-- 集合映射之:List映射，其他的同上面的Set映射 -->
+         <list name="listImages" table="list_images" lazy="true">
+         	<key column="customer_id" />
+         	<list-index column="position" /><!-- 用于设置list_images表中代表索引位置的position字段 -->
+         	<element column="filename" type="string" not-null="true" />
+         </list>
+         
+         <!-- 集合映射之:Map映射，其他的同上面的Set映射 -->
+         <map name="mapImages" table="map_images" lazy="true">
+         	<key column="customer_id" />
+         	<map-key type="string" column="image_name" />
+         	<element column="filename" type="string" not-null="true" />
+		</map>
+		
+    </class>
+    
+    <!-- Order类的映射 -->
+    <class name="Order" table="orders">
+        <id name="id" type="long" column="id">
+            <generator class="native" />
+        </id>
+        <property name="orderNumber" type="string" column="order_number" />
+        
+        <!-- formula可以指定SQL表达式 -->
+        <property name="price" 
+        	formula="(select sum(line.base_price * line.quantity) 
+        		from lineitems line 
+        		where line.order_id=id)" />
+        		
+        <set name="lineItems" lazy="true" table="lineitems">
+        	<key column="order_id" />
+        	<composite-element class="LineItems">
+        		<parent name="order" />
+        		<many-to-one name="item" 
+        			class="Item" 
+        			column="item_id" 
+        			not-null="true" />
+        		<property name="quantity" column="quantity" type="int" not-null="true" />
+        		<property name="basePrice" column="base_price" type="double" not-null="true" />
+        	</composite-element>
+        </set>
+        
+        <!-- 从Order到Customer的多对一映射：多个Order对应一个Customer -->
+        <many-to-one 
+        	name="customer" 
+        	class="Customer" 
+        	column="customer_id"
+        	not-null="true"
+        	cascade="save-update"
+        	lazy="false"
+        />
+    </class>
+    
+    <!-- Category类的映射 -->
+    <class name="Category" table="categories">
+		<id name="id" type="integer" column="id">
+			<generator class="native" />
+		</id>
+		
+		<property name="name" type="string" column="name" />
+		
+		<!-- 多对一映射：多个Category对应一个父类的parentCategory -->
+		<many-to-one 
+			name="parentCategory" 
+			column="cat_id"
+			class="Category"
+			cascade="save-update"
+		/>
+		
+		<!-- 一对多映射：一个Category对应多个子类的childCategories -->
+		<set name="childCategories" cascade="save-update" inverse="true">
+			<key column="cat_id" />
+			<one-to-many class="Category" />	
+		</set>
+		
+		<!-- 多对多映射：多个Category到多个Item的对应
+			由于关系数据库中无法直接表示多对多关系，只有借助中间表:category_item,它同时参照categories表和items表
+		 -->
+		 <set name="items" table="category_item" lazy="true" cascade="save-update">
+	 		<key column="category_id" /><!-- 指定 category_item 表的 category_id 字段参照Categories表 -->
+	 		
+	 		<!-- class属性指定items集合中存放的是Item对象，
+	 		column属性指定 category_item 表中参照items 表的外键为item_id -->
+	 		<many-to-many class="Item" column="item_id" />	
+		 </set>
+    </class>
+    
+    <!-- Item类的映射 -->
+    <class name="Item" table="items">
+		<id name="id" type="int" column="ID">
+			<generator class="native" />
+		</id>
+	
+		<property name="name" column="name" type="string" />
+		<property name="basePrice" column="base_price" type="double" />
+		
+		<!-- 多对多映射：多个 Item 到多个 Category 的对应
+			"与前面的 多个Category到多个Item的对应" 一起组成双向多对多映射
+			由于关系数据库中无法直接表示多对多关系，只有借助中间表:category_item,它同时参照categories表和items表
+			inverse="true":在双向多对多关联中，必须把其中一端的<set>元素的inverse属性设为true（inverse的意义见上文）
+			在双向多对多关联中，inverse="true"的一端，只能用<set>和<bag>，而不能用<list>,<map>,<idbag>等
+		-->
+		<set name="categories" table="category_item"
+			lazy="true" 
+			inverse="true" 
+			cascade="save-update">
+			<key column="item_id" /><!-- 指定 category_item 表的 item_id 字段参照 items 表 -->
+			
+			<!-- class属性指定items集合中存放的是Item对象，
+	 		column属性指定 category_item 表中参照 categories 表的外键为category_id -->
+			<many-to-many class="Category" column="category_id" />
+		</set>
+		
+	</class>
+    
+    <!-- Company类的映射 -->
+    <class name="Company" table="company">
+    	<id name="id" type="int" column="id">
+    		<generator class="native" />
+    	</id>
+    	
+    	<property name="name" type="string" column="name" />
+    	
+    	<!-- 映射Company到Employee的一对多关系 -->
+    	<set name="employees" inverse="true">
+    		<key column="company_id" />
+    		<one-to-many class="Employee" />
+    	</set>
+    </class>
+    
+    <!-- Employee类的映射，这里演示继承映射 -->
+    <class name="Employee" table="employees" discriminator-value="not-null">
+    	<id name="id" column="id" type="int">
+    		<generator class="native" />
+    	</id>
+    	
+    	<!-- 继承映射中，用来描述子类类型 -->
+    	<!-- 另外需要特别注意的是，discriminator 标签一定要定义在主键标签之后，属性标签之前。
+    		这是因为hibernate-mapping-3.0.dtd里面约定了顺序 。。。蛋疼的一逼。。。之前顺序错了，搞了半天，才百度出来-->
+    	<discriminator column="employee_type" type="string" />
+    	
+    	<property name="name" type="string" column="name" />
+    	
+    	<!-- 映射Employee到Company的多对一关系 -->
+    	<many-to-one 
+    		name="company" 
+    		column="company_id" 
+    		class="Company"
+    		cascade="save-update"
+    		lazy="false" 
+    	/>
+    	
+    	<!-- HourlyEmployee子类的映射，用 HE 来代表 -->
+    	<subclass name="HourlyEmployee" discriminator-value="HE">
+    		<property name="rate" column="rate" type="int" />
+    	</subclass>
+    	
+    	<!-- SalariedEmployee子类的映射，用SE 来代表 -->
+    	<subclass name="SalariedEmployee" discriminator-value="SE">
+    		<property name="salary" column="salary" type="int" />
+    	</subclass>
+    </class>
+    
+</hibernate-mapping>
