@@ -86,7 +86,6 @@ public class UserAction extends BaseAction<User> {
 //
 //		return "toList";
 //	}
-//
 //	/** 修改页面 */
 //	public String editUI() throws Exception {
 //		// 准备数据, departmentList
