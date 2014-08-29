@@ -278,7 +278,7 @@ public class UserAction extends BaseAction<User> {
 //		findAll(String pageStr, String rowsStr, String orderColumn, String order)
 		List<User> userList = userService.findAll(getPage(), getRows(), getSort(), getOrder());
 		
-		int totalCount = userService.totalCount();
+		Integer totalCount = userService.totalCount();
 //		// 先过滤对set集合的拆解
 		JsonConfig config = new JsonConfig();
 		config.setExcludes(new String[]{"department", "userGroup"});
