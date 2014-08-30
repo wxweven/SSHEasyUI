@@ -1,9 +1,7 @@
 package com.wxweven.action;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JsonConfig;
@@ -85,7 +83,6 @@ public class UserAction extends BaseAction<User> {
 //
 //		return "toList";
 //	}
-//
 //	/** 修改页面 */
 //	public String editUI() throws Exception {
 //		// 准备数据, departmentList
@@ -214,8 +211,7 @@ public class UserAction extends BaseAction<User> {
 		logger.debug("param中的验证码" + paramCaptcha);
 
 		return sessionCaptcha.equals(paramCaptcha);
-		// String captcha =
-		// ActionContext.getContext().getSession().get("randomStr").toString();
+		// String captcha = ActionContext.getContext().getSession().get("randomStr").toString();
 	}
 
 	/** 注销 */
@@ -227,19 +223,17 @@ public class UserAction extends BaseAction<User> {
 	
 	/** 修改用户密码 */
 	public String changePWD() throws Exception {
-		logger.debug("user:"+request.getSession().getAttribute("user"));
-//		logger.debug("user id:"+model.getId());
-		// 1, 从session中取出原对象
+		// 1. 从session中取出原对象
 		User user = (User) request.getSession().getAttribute("user");
-		// 2, 设置要修改的密码, 新密码值由post请求传递（要使用MD5摘要）
+		// 2. 设置要修改的密码, 新密码值由post请求传递（要使用MD5摘要）
 		String md5Digest = DigestUtils.md5Hex(getNewPass());
 		user.setPassword(md5Digest);
 		logger.debug("new password:"+getNewPass());
 		
-		// 3, 更新到数据库
+		// 3. 更新到数据库
 		userService.update(user);
 		
-		// 4,返回提示信息给前台
+		// 4. 返回提示信息给前台
 		out.print(getNewPass());
 		out.flush();
 		out.close();
@@ -255,7 +249,7 @@ public class UserAction extends BaseAction<User> {
 		//1. 获取已登录的session中的user
 		User user = (User) request.getSession().getAttribute("user");
 		if(user != null) {
-			//2. 根据user 来获取菜单
+		//2. 根据user 来获取菜单
 			menus = userService.getUserMenu(user);
 		}
 		
@@ -275,25 +269,30 @@ public class UserAction extends BaseAction<User> {
 	
 	/** 获取用户列表数据 */
 	public String list() throws Exception {
-//		findAll(String pageStr, String rowsStr, String orderColumn, String order)
-//		logger.debug("id--->"+model.getId());
-//		Map<String,String> conditions = new HashMap<String, String>();
-		
-//		getModelConditions();
+		// 1. 根据分页，排序，查询条件等来获取用户列表
 		List<User> userList = userService.findAll(getPage(), getRows(), getSort(), getOrder(), getModelConditions());
+		// 2. 获得符合条件的用户的总数(不带分页)
 		int totalCount = userService.totalCount();
-//		// 先过滤对set集合的拆解
-		JsonConfig config = new JsonConfig();
-		config.setExcludes(new String[]{"department", "userGroup"});
 		
-		String resultStr = JSONArray.fromObject(userList,config).toString();
+		// 3. 过滤掉无关的关联属性"department", "userGroup"，否则容易引起死循环异常
+		JsonConfig config = new JsonConfig();
+		config.setExcludes(new String[] { "department", "userGroup" });
+
+		// 4. 根据list得到json字符串
+		String resultStr = JSONArray.fromObject(userList, config).toString();
+
+		// 5. 包装json字符串，符合easyui要求
 		resultStr = wrapReturnJsonStr(resultStr, totalCount);
-		logger.debug("userList--->"+resultStr);
-//		ActionContext.getContext().put("userList", userList);
+
+		logger.debug("userList--->" + resultStr);
+
+		// 6. 返回数据给前台
 		out.print(resultStr);
 		out.flush();
 		out.close();
-		return null;
+
+		// 7. 由于直接返回数据给前台，而不需要跳转页面，这里直接返回null
+		return null;// 返回 null 表示不用跳转页面
 	}
 	
 	
@@ -362,7 +361,4 @@ public class UserAction extends BaseAction<User> {
 	public void setOrder(String order) {
 		this.order = order;
 	}
-
-
-	
 }
