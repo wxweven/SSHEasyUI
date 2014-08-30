@@ -92,7 +92,4 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 
 		return resultStr.toString();
 	}
-
-	
-	
 }

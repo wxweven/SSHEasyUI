@@ -2,6 +2,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 <link href="${pageContext.request.contextPath}/script/formValidator/style/validator.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/style/css/jspList.css" rel="stylesheet" type="text/css" />
 
 <link href="${pageContext.request.contextPath}/script/themes/default/easyui.css" rel="stylesheet" type="text/css" />
 <link href="${pageContext.request.contextPath}/script/themes/icon.css" rel="stylesheet" type="text/css" />

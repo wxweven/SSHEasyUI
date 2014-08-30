@@ -1,6 +1,7 @@
 package com.wxweven.base;
 
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Query;
 /**
@@ -61,7 +62,7 @@ public interface BaseService<T> {
 	 * @param order
 	 * @return
 	 */
-	List<T> findAll(String page, String rows, String orderColumn, String order);
+	List<T> findAll(String page, String rows, String orderColumn, String order, Map<String, Object> conditions);
 	
 	/**
 	 * 查询所有记录的条数

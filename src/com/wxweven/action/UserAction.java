@@ -1,20 +1,16 @@
 package com.wxweven.action;
 
-import java.util.HashSet;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JsonConfig;
-import net.sf.json.util.PropertyFilter;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.struts2.ServletActionContext;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 
 import com.opensymphony.xwork2.ActionContext;
@@ -38,8 +34,6 @@ public class UserAction extends BaseAction<User> {
 	private static final long serialVersionUID = -3945297891744479559L;
 	
 //	private transient User user;//当前登录的用户
-	
-	private Log logger = LogFactory.getLog(this.getClass());
 	
 	private String returnMesg = null;
 	private String usercaptcha;//验证码参数
@@ -187,8 +181,13 @@ public class UserAction extends BaseAction<User> {
 			out.close();
 			return null;
 		} else {
-			// 将登录用户存入 session
+			//1. 将登录用户存入 session
 			ActionContext.getContext().getSession().put("user", user);
+			//2. 更改用户的登录时间为当前时间
+			user.setLastLoginTime(new Date());
+			userService.update(user);//将更改同步到数据库
+			
+			//3. 返回数据给前台
 			out.print("success");
 			out.flush();
 			out.close();
@@ -270,13 +269,18 @@ public class UserAction extends BaseAction<User> {
 
 	/** 默认显示list.jsp页面 */
 	public String toList() throws Exception {
+		ActionContext.getContext().put("jspGridTitle", "用户列表");
 		return "list";
 	}
 	
 	/** 获取用户列表数据 */
 	public String list() throws Exception {
 //		findAll(String pageStr, String rowsStr, String orderColumn, String order)
-		List<User> userList = userService.findAll(getPage(), getRows(), getSort(), getOrder());
+//		logger.debug("id--->"+model.getId());
+//		Map<String,String> conditions = new HashMap<String, String>();
+		
+//		getModelConditions();
+		List<User> userList = userService.findAll(getPage(), getRows(), getSort(), getOrder(), getModelConditions());
 		int totalCount = userService.totalCount();
 //		// 先过滤对set集合的拆解
 		JsonConfig config = new JsonConfig();
@@ -291,6 +295,7 @@ public class UserAction extends BaseAction<User> {
 		out.close();
 		return null;
 	}
+	
 	
 	// ---getters and setters
 
