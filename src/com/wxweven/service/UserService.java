@@ -22,4 +22,12 @@ public interface UserService extends BaseService<User> {
 	 * @return
 	 */
 	String getUserMenu(User user);
+	
+	/**
+	 * 
+	 * 判断指定的用户名是否已经存在
+	 * @param loginName
+	 * @return
+	 */
+	boolean isExist(String loginName);
 }

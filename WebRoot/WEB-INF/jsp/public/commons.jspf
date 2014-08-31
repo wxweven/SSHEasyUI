@@ -11,12 +11,9 @@
 
 <script src="${pageContext.request.contextPath}/script/jquery.easyui.min.js" type="text/javascript"></script>
 <script src="${pageContext.request.contextPath}/script/easyui-lang-zh_CN.js" type="text/javascript"></script>
+<script src="${pageContext.request.contextPath}/script/jquery.validatebox.rules.js" type="text/javascript"></script>
 
 <script src="${pageContext.request.contextPath}/script/jquery.blockUI.js" type="text/javascript" ></script>
-<script src="${pageContext.request.contextPath}/script/formValidator/formValidator-4.0.1.min.js" type="text/javascript" ></script>
-<script src="${pageContext.request.contextPath}/script/formValidator/formValidatorRegex.js" type="text/javascript" ></script>
-
-
 
 <script type="text/javascript"></script>
 

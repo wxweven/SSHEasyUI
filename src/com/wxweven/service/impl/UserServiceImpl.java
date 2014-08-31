@@ -30,10 +30,11 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 	public User findByLoginNameAndPassword(String loginName, String password) {
 		// 使用密码的MD5摘要进行对比
 		String md5Digest = DigestUtils.md5Hex(password);
-		String hql = "FROM User u WHERE u.loginName=? AND u.password=?";
+		String hql = "FROM User u WHERE u.loginName=? AND u.password=? and u.userState=?";
 		return (User) getSession().createQuery(hql)//
 				.setParameter(0, loginName)//
 				.setParameter(1, md5Digest)//
+				.setParameter(2, "可用")//
 				.uniqueResult();
 	}
 
@@ -91,5 +92,19 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 		logger.debug("jsonMenus:" + resultStr);
 
 		return resultStr.toString();
+	}
+
+	
+	@Override
+	public boolean isExist(String loginName) {
+		String hql = "FROM User u WHERE u.loginName = ?";
+		List list = getSession().createQuery(hql)//
+				.setParameter(0, loginName)//
+				.list();
+		if(list == null || list.isEmpty()){//指定用户名的记录不存在
+			return false;
+		}
+		
+		return true;
 	}
 }

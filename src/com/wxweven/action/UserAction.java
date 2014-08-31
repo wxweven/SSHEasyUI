@@ -52,37 +52,8 @@ public class UserAction extends BaseAction<User> {
 //		return "toList";
 //	}
 //
-//	/** 添加页面 */
-//	public String addUI() throws Exception {
-//		// 准备数据, departmentList
-//		List<Department> topList = departmentService.findTopList();
-//		List<Department> departmentList = DepartmentUtils.getAllDepartments(topList);
-//		ActionContext.getContext().put("departmentList", departmentList);
 //
-//		// 准备数据, roleList
-//		List<Role> roleList = roleService.findAll();
-//		ActionContext.getContext().put("roleList", roleList);
-//
-//		return "saveUI";
-//	}
-//
-//	/** 添加 */
-//	public String add() throws Exception {
-//		// 封装到对象中（当model是实体类型时，也可以使用model，但要设置未封装的属性）
-//		// >> 设置所属部门
-//		model.setDepartment(departmentService.getById(departmentId));
-//		// >> 设置关联的岗位
-//		List<Role> roleList = roleService.getByIds(roleIds);
-//		model.setRoles(new HashSet<Role>(roleList));
-//		// >> 设置默认密码为1234（要使用MD5摘要）
-//		String md5Digest = DigestUtils.md5Hex("1234");
-//		model.setPassword(md5Digest);
-//
-//		// 保存到数据库
-//		userService.save(model);
-//
-//		return "toList";
-//	}
+
 //	/** 修改页面 */
 //	public String editUI() throws Exception {
 //		// 准备数据, departmentList
@@ -295,6 +266,58 @@ public class UserAction extends BaseAction<User> {
 		return null;// 返回 null 表示不用跳转页面
 	}
 	
+	/** 添加页面 */
+	public String addUI() throws Exception {
+		// 准备数据, departmentList
+//		List<Department> topList = departmentService.findTopList();
+//		List<Department> departmentList = DepartmentUtils.getAllDepartments(topList);
+//		ActionContext.getContext().put("departmentList", departmentList);
+//
+//		// 准备数据, roleList
+//		List<Role> roleList = roleService.findAll();
+//		ActionContext.getContext().put("roleList", roleList);
+		return "addUI";
+	}
+	
+	/** 检查loginName是否存在 */
+	public String isExist() throws Exception {
+		String retMsg = "false";
+		logger.debug("model---->"+model);
+		boolean exist = userService.isExist(model.getLoginName());
+		if(exist){
+			retMsg = "true";
+		}
+		
+		out.print(retMsg);
+		out.flush();
+		out.close();
+		
+		return null;
+	}
+	
+	/** 添加 */
+	public String add() throws Exception {
+		//TODO 保存用户时，关联部门和用户组
+		// 封装到对象中（当model是实体类型时，也可以使用model，但要设置未封装的属性）
+		// >> 设置所属部门
+//		model.setDepartment(departmentService.getById(departmentId));
+//		// >> 设置关联的岗位
+//		List<Role> roleList = roleService.getByIds(roleIds);
+//		model.setRoles(new HashSet<Role>(roleList));
+		// >> 密码要使用MD5摘要加密
+//		String md5Digest = DigestUtils.md5Hex(model.getPassword());
+//		model.setPassword(md5Digest);
+//
+//		// 保存到数据库
+		logger.debug("model---->"+model);
+		userService.save(model);
+
+		out.print("success");
+		out.flush();
+		out.close();
+		
+		return "null";
+	}
 	
 	// ---getters and setters
 
