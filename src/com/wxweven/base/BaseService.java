@@ -41,10 +41,18 @@ public interface BaseService<T> {
 	/**
 	 * 查询实体
 	 * 
-	 * @param id
+	 * @param id Integer类型
 	 * @return
 	 */
 	T getById(Integer id);
+	
+	/**
+	 * 查询实体
+	 * 
+	 * @param id String 类型
+	 * @return
+	 */
+	T getById(String id);
 
 	/**
 	 * 查询实体

@@ -121,6 +121,12 @@ public class Department implements java.io.Serializable {
 	public void setSysMenus(Set<SysMenu> sysMenus) {
 		this.sysMenus = sysMenus;
 	}
+
+	@Override
+	public String toString() {
+		return "Department [id=" + id + ", name=" + name + "]";
+	}
+
 	
 
 }

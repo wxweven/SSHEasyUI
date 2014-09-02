@@ -9,10 +9,8 @@
 			<tr>
 				<th><label for="loginName">用户名：</label></th>
 				<td>
-					<input class="easyui-validatebox" type="text" id="loginName" name="loginName" 
+					<input class="easyui-validatebox" type="text" id="loginName" name="loginName"
 						data-options="required:true,validType:'loginName'"/>
-<!-- 					<input class="easyui-validatebox" type="text" id="loginName" name="loginName" 
-						data-options="required:true,validType:['username','unique[\'#loginName\',\'user_isExist.action\']']"/> -->
 				</td>
 				
 				<th><label for="realName">真实姓名：</label></th>
@@ -30,6 +28,15 @@
 				<th><label for="repassword">确认密码：</label></th>
 				<td><input class="easyui-validatebox" type="password" id="repassword" name="repassword"
 					 required="true" missingMessage="请再次填写新密码" validType="equalTo['#password']" /></td>
+			</tr>
+			
+			<tr>	
+				<th><label for="departmentId">所属部门：</label></th>
+				<td><input class="easyui-validatebox" type="text" id="departmentId" name="departmentId" /></td>
+				
+				<!-- <th><label for="userGroupId">所属用户组：</label></th>
+				<td><input class="easyui-validatebox" type="text" id="userGroupId" name="userGroupId"
+					 required="true" /></td> -->
 			</tr>
 			
 			<tr>
@@ -69,10 +76,9 @@
 			
 			<tr>
             	<td colspan="4" style="text-align:right; padding-top:10px">
-                	<a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddOK" 
-                		iconcls="icon-ok" onclick="submitForm()">确定</a>
-                 	<a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" 
-                 		onclick="javascript:closeDialog()">取消</a>
+                	<a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddOK" iconcls="icon-ok" 
+                		onclick="javascript:submitForm()">确定</a>
+                 	<a href="javascript:void(0)" class="easyui-linkbutton" id="btnCancel" iconcls="icon-cancel" >取消</a>
               	</td>
           	</tr>
 		</table>
@@ -80,65 +86,36 @@
 	
 </div>
 
-<script>
-	
-	/* $(function(){
-		//表单验证，利用formValidator-4.0.1.min.js
-		//表单验证的配置
-		$.formValidator.initConfig({
-			validatorgroup:"1",
-			formid:"ffAdd",
-			onerror:function(msg){
-				alert(msg);
-			}
-		}); 
-		
-		//验证用户名
-		$("#loginName").formValidator({
-			 onshow:"请输入用户名",
-			 onfocus:"用户名至少6个字符,最多10个字符"
-		}).inputValidator({
-			min:6,
-			max:10,
-			onerror:"你输入的用户名非法,请确认"
-		});
-	}); */
-	/* $(function(){
-		$('#loginName').blur(function(){
-			var postData = {'loginName': $(this).val()};
-			console.log(postData);
-			$.ajax({
-				url: 'user_isExist.action',
-				type: 'POST',
-				data: postData,
-				async: false,//默认为true，代表异步请求；如果为false，代表同步请求
-//				dataType: 'json',//预期服务器返回的数据类型为 json
-				success: callback
-				
+<script type="text/javascript">
+$(function(){
+	//用户所属部门下拉框：获取所有的部门
+	$('#departmentId').combotree({
+	    url:'department_getDepartmentTree.action',
+	    valueField: 'id',
+        textField: 'text',
+	    required: true
+	});
+});
+
+function submitForm() {
+	$('#ffAdd').form('submit', {
+		url: 'user_add.action',//指定提交的url
+		onSubmit : function() {
+			return $(this).form('enableValidation').form('validate');
+		},
+	    success:function(data){
+	    	$.messager.alert("添加信息",data,'info',function(){
+					location.reload(true);//显示信息后的回调函数：重新加载原页面
 			});
-			
-		});
-	}); */
-	
-	function submitForm() {
-		$('#ffAdd').form('submit', {
-			url: 'user_add.action',//指定提交的url
-			onSubmit : function() {
-				return $(this).form('enableValidation').form('validate');
-			},
-		    success:function(data){
-		    	$.messager.alert("添加信息",data,'info',function(){
-						location.reload(true);//显示信息后的回调函数：重新加载原页面
-				});
-		    	$('#dialog').dialog('close');
-		    }
-		});
-	}
-	function closeDialog() {
-		$('#dialog').dialog('close');
-	}
-	
-	
+	    	$('#dialog').dialog('close');
+	    }
+	});
+}
+
+function closeDialog() {
+	$('#dialog').dialog('close');
+}
+
 </script>
 
 </body>

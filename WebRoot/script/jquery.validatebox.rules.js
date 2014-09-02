@@ -16,7 +16,7 @@ $.extend($.fn.validatebox.defaults.rules,{
     	validator: function (value, param) { 
     		return $(param[0]).val() == value; 
     	}, 
-    	message: '两次输入不匹配' 
+    	message: '两次密码输入不匹配' 
     },
     loginName: {//验证用户名是否重复
     	validator: function (value, param) {// param 参数集合

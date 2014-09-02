@@ -55,6 +55,10 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 	public T getById(Integer id) {
 		return (T) getSession().get(clazz, id);
 	}
+	
+	public T getById(String id) {
+		return (T) getSession().get(clazz, id);
+	}
 
 	public List<T> getByIds(Integer[] ids) {
 		if (ids == null || ids.length == 0) {

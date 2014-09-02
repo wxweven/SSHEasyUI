@@ -113,9 +113,10 @@
 		$('#dialog').dialog({
 		    title: '添加用户',
 		    width: 700,
-		    height: 300,
+		    height: 350,
 		    closed: false,
 		    cache: false,
+		    resizable: true,
 		    content: '表单',
 		    //href: "${pageContext.request.contextPath}/saveUI.jsp",
 		    href: 'user_addUI.action',

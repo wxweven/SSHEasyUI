@@ -60,6 +60,62 @@ public class JunitTest {
 	}
 	
 	@Test
+	public void testfff(){
+		String str = "[,{111111";
+		logger.debug("str------>"+str.replaceAll("\\[,", "\\["));
+
+	}
+	
+	private String printNode(Department dept, int level) {
+		
+		StringBuilder resultStr = new StringBuilder();
+		resultStr.append("{'id':").append("'").append(dept.getId()).append("'").append(",");
+		resultStr.append("'text':").append("'").append(dept.getName()).append("'");
+		
+		if(dept.getChildren() != null && !dept.getChildren().isEmpty()){
+			resultStr.append(",'children':[");
+			//循环构建子部门 json
+			for (Department children : dept.getChildren()) {
+				resultStr.append(printNode(children, level + 1));
+			}
+			
+			resultStr.append("],");
+		}
+		resultStr.append("},");
+		
+		
+		return resultStr.toString();
+	}
+
+	
+	@Test
+	public void getDepartmentMTree() {
+		session.beginTransaction();
+		// --------------------------------------------
+		
+		StringBuilder resultStr = new StringBuilder();// 定义最终返回的 json 格式的字符串
+		
+		String hql = "from Department where parentId is null";//获取顶级部门
+		Query query = getSession().createQuery(hql);
+		List resultList = query.list();
+		Department topDept = (Department) resultList.get(0);
+		
+		resultStr.append("[");
+		
+		resultStr.append(printNode(topDept,1));
+		
+		resultStr.append("]");
+		
+		logger.error("部门列表-->"+resultStr.toString());
+		
+		
+		// --------------------------------------------
+		session.getTransaction().commit();
+		session.close();
+	}
+	
+	
+	@Test
 	public void getMenusByDept(){
 		session.beginTransaction();
 		// --------------------------------------------

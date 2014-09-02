@@ -20,6 +20,7 @@ import org.apache.struts2.ServletActionContext;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.ModelDriven;
+import com.wxweven.service.DepartmentService;
 import com.wxweven.service.UserService;
 
 public abstract class BaseAction<T> extends ActionSupport implements ModelDriven<T> {
@@ -101,8 +102,8 @@ public abstract class BaseAction<T> extends ActionSupport implements ModelDriven
 	// =============== Service实例的声明 ==================
 //	@Resource
 //	protected RoleService roleService;
-//	@Resource
-//	protected DepartmentService departmentService;
+	@Resource
+	protected DepartmentService departmentService;
 	@Resource
 	protected UserService userService;
 //	@Resource

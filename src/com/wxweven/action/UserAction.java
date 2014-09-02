@@ -31,14 +31,14 @@ public class UserAction extends BaseAction<User> {
 
 	private static final long serialVersionUID = -3945297891744479559L;
 	
-//	private transient User user;//当前登录的用户
-	
 	private String returnMesg = null;
 	private String usercaptcha;//验证码参数
 	private String newPass;//用户需要更改的新密码
 	
-	private Long departmentId;
-	private Long[] roleIds;
+	/** 与 User 关联的 Department 以及 UserGroup，只需要持有 id 属性 */
+	private String departmentId;
+	private String userGroupId;
+	private Integer[] roleIds;
 	
 	/** 分页 排序参数 */
 	private String page;//当前页
@@ -268,21 +268,34 @@ public class UserAction extends BaseAction<User> {
 	
 	/** 添加页面 */
 	public String addUI() throws Exception {
-		// 准备数据, departmentList
-//		List<Department> topList = departmentService.findTopList();
-//		List<Department> departmentList = DepartmentUtils.getAllDepartments(topList);
-//		ActionContext.getContext().put("departmentList", departmentList);
-//
-//		// 准备数据, roleList
-//		List<Role> roleList = roleService.findAll();
-//		ActionContext.getContext().put("roleList", roleList);
 		return "addUI";
+	}
+	
+	/** 添加 */
+	public String add() throws Exception {
+		// 封装到对象中（当model是实体类型时，也可以使用model，但要设置未封装的属性）
+		// >> 设置所属部门
+		model.setDepartment(departmentService.getById(departmentId));
+		// >> 设置关联的用户组
+		
+		// >> 密码要使用MD5摘要加密
+		String md5Digest = DigestUtils.md5Hex(model.getPassword());
+		model.setPassword(md5Digest);
+
+		// >> 保存到数据库
+		logger.debug("user add model---->"+model);
+		userService.save(model);
+
+		out.print("success");
+		out.flush();
+		out.close();
+		
+		return null;
 	}
 	
 	/** 检查loginName是否存在 */
 	public String isExist() throws Exception {
 		String retMsg = "false";
-		logger.debug("model---->"+model);
 		boolean exist = userService.isExist(model.getLoginName());
 		if(exist){
 			retMsg = "true";
@@ -295,47 +308,8 @@ public class UserAction extends BaseAction<User> {
 		return null;
 	}
 	
-	/** 添加 */
-	public String add() throws Exception {
-		//TODO 保存用户时，关联部门和用户组
-		// 封装到对象中（当model是实体类型时，也可以使用model，但要设置未封装的属性）
-		// >> 设置所属部门
-//		model.setDepartment(departmentService.getById(departmentId));
-//		// >> 设置关联的岗位
-//		List<Role> roleList = roleService.getByIds(roleIds);
-//		model.setRoles(new HashSet<Role>(roleList));
-		// >> 密码要使用MD5摘要加密
-//		String md5Digest = DigestUtils.md5Hex(model.getPassword());
-//		model.setPassword(md5Digest);
-//
-//		// 保存到数据库
-		logger.debug("model---->"+model);
-		userService.save(model);
-
-		out.print("success");
-		out.flush();
-		out.close();
-		
-		return "null";
-	}
-	
 	// ---getters and setters
 
-	public Long getDepartmentId() {
-		return departmentId;
-	}
-
-	public void setDepartmentId(Long departmentId) {
-		this.departmentId = departmentId;
-	}
-
-	public Long[] getRoleIds() {
-		return roleIds;
-	}
-
-	public void setRoleIds(Long[] roleIds) {
-		this.roleIds = roleIds;
-	}
 
 	public String getUsercaptcha() {
 		return usercaptcha;
@@ -383,5 +357,29 @@ public class UserAction extends BaseAction<User> {
 
 	public void setOrder(String order) {
 		this.order = order;
+	}
+
+	public String getDepartmentId() {
+		return departmentId;
+	}
+
+	public void setDepartmentId(String departmentId) {
+		this.departmentId = departmentId;
+	}
+
+	public Integer[] getRoleIds() {
+		return roleIds;
+	}
+
+	public void setRoleIds(Integer[] roleIds) {
+		this.roleIds = roleIds;
+	}
+
+	public String getUserGroupId() {
+		return userGroupId;
+	}
+
+	public void setUserGroupId(String userGroupId) {
+		this.userGroupId = userGroupId;
 	}
 }

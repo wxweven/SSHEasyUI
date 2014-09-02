@@ -80,5 +80,13 @@
 			<result name="toIndex" type="redirect">/index.jsp</result>
 		</action>
 		
+		<!-- 部门管理 -->		
+		<action name="department_*" class="departmentAction" method="{1}">
+			<result name="list">/WEB-INF/jsp/userAction/list.jsp</result>
+			<result name="{1}">/WEB-INF/jsp/userAction/{1}.jsp</result>
+			<!-- <result name="toList" type="redirectAction">user_list</result> -->
+			
+			<result name="toIndex" type="redirect">/index.jsp</result>
+		</action>
 	</package>
 </struts>

@@ -1,11 +1,19 @@
 package com.wxweven.utils;
 
-
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.AbstractInterceptor;
 import com.wxweven.domain.User;
-
+/**
+ * 
+ * @author wxweven
+ * @date 2014年9月1日
+ * @version 1.0
+ * @email wxweven@163.com
+ * @blog http://wxweven.blog.163.com/
+ * @Copyright: Copyright (c) wxweven 2014
+ * @Description: 权限验证拦截器：所有的Action都需要进行权限验证
+ */
 public class CheckPrivilegeInterceptor extends AbstractInterceptor {
 
 	public String intercept(ActionInvocation invocation) throws Exception {
