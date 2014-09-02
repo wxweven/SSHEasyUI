@@ -1,5 +1,6 @@
 package com.wxweven.action;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +39,8 @@ public class UserAction extends BaseAction<User> {
 	/** 与 User 关联的 Department 以及 UserGroup，只需要持有 id 属性 */
 	private String departmentId;
 	private String userGroupId;
-	private Integer[] roleIds;
+	
+	private Integer[] deletIds;//要被删除的记录的id
 	
 	/** 分页 排序参数 */
 	private String page;//当前页
@@ -46,41 +48,8 @@ public class UserAction extends BaseAction<User> {
 	private String sort;//排序的字段
 	private String order;//ASC 或者 desc
 	
-//	/** 删除 */
-//	public String delete() throws Exception {
-//		userService.delete(model.getId());
-//		return "toList";
-//	}
-//
-//
 
-//	/** 修改页面 */
-//	public String editUI() throws Exception {
-//		// 准备数据, departmentList
-//		List<Department> topList = departmentService.findTopList();
-//		List<Department> departmentList = DepartmentUtils.getAllDepartments(topList);
-//		ActionContext.getContext().put("departmentList", departmentList);
-//
-//		// 准备数据, roleList
-//		List<Role> roleList = roleService.findAll();
-//		ActionContext.getContext().put("roleList", roleList);
-//
-//		// 准备回显的数据
-//		User user = userService.getById(model.getId());
-//		ActionContext.getContext().getValueStack().push(user);
-//		if (user.getDepartment() != null) {
-//			departmentId = user.getDepartment().getId();
-//		}
-//		if (user.getRoles() != null) {
-//			roleIds = new Long[user.getRoles().size()];
-//			int index = 0;
-//			for (Role role : user.getRoles()) {
-//				roleIds[index++] = role.getId();
-//			}
-//		}
-//
-//		return "saveUI";
-//	}
+
 //
 //	/** 修改 */
 //	public String edit() throws Exception {
@@ -286,12 +255,52 @@ public class UserAction extends BaseAction<User> {
 		logger.debug("user add model---->"+model);
 		userService.save(model);
 
-		out.print("success");
+		out.print("添加用户成功！");
 		out.flush();
 		out.close();
 		
 		return null;
 	}
+	
+	/** 删除 */
+	public String delete() throws Exception {
+//		logger.debug("删除的id是----》"+Arrays.asList(getDeletIds()));
+		//循环删除对应id的记录
+		for(int i=0;i<getDeletIds().length;i++){
+			userService.delete(getDeletIds()[i]);
+		}
+		
+		out.print("删除记录成功！");
+		out.flush();
+		out.close();
+		
+		return null;
+	}
+	
+	/** 修改页面 */
+	public String editUI() throws Exception {
+		// 准备数据, departmentList
+//		List<Department> topList = departmentService.findTopList();
+//		List<Department> departmentList = DepartmentUtils.getAllDepartments(topList);
+//		ActionContext.getContext().put("departmentList", departmentList);
+
+		// 准备数据, roleList
+//		List<Role> roleList = roleService.findAll();
+//		ActionContext.getContext().put("roleList", roleList);
+
+		// 准备回显的数据
+		logger.debug("id---->"+model.getId());
+		User user = userService.getById(model.getId());
+		logger.debug("user---->"+user);
+		ActionContext.getContext().getValueStack().push(user);
+		if (user.getDepartment() != null) {
+			departmentId = user.getDepartment().getId();
+		}
+
+		return "addUI";
+	}
+	
+	
 	
 	/** 检查loginName是否存在 */
 	public String isExist() throws Exception {
@@ -367,19 +376,19 @@ public class UserAction extends BaseAction<User> {
 		this.departmentId = departmentId;
 	}
 
-	public Integer[] getRoleIds() {
-		return roleIds;
-	}
-
-	public void setRoleIds(Integer[] roleIds) {
-		this.roleIds = roleIds;
-	}
-
 	public String getUserGroupId() {
 		return userGroupId;
 	}
 
 	public void setUserGroupId(String userGroupId) {
 		this.userGroupId = userGroupId;
+	}
+
+	public Integer[] getDeletIds() {
+		return deletIds;
+	}
+
+	public void setDeletIds(Integer[] deletIds) {
+		this.deletIds = deletIds;
 	}
 }

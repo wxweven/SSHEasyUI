@@ -49,7 +49,7 @@
     <div style="height: 6px;bbackground-color:#BBD2E9;"></div>
 	<div class="easyui-panel" title="${jspGridTitle}" style="width:900px;padding:0px;"></div>
 	
-<!-- =========显示数据表格======== -->
+<!-- =========显示数据表格列表======== -->
 	<table id="dategrid"></table>
 	
 <!-- =========显示弹窗======== -->
@@ -59,7 +59,9 @@
 	$(function() {
 		//定义表格上的工具条
 		var toolbar = [ 
-			{text : 'Add', iconCls : 'icon-add', handler : addUser}//添加用户
+			{text : '添加', iconCls : 'icon-add', handler : addUser},//添加用户
+			{text : '删除', iconCls : 'icon-remove', handler : deleteUser},//删除用户，支持批量删除
+			{text : '修改', iconCls : 'icon-edit', handler : editUser}//修改用户，只能单个修改
 		];
 
 		//加载datagrid数据表格
@@ -75,7 +77,7 @@
 			toolbar : toolbar,
 			resizeable : true,//宽度可调整
 			fitColumns : true,//自适应表格宽度
-			pageSize : 5,//默认选择的分页是每页5行数据  
+			pageSize : 10,//默认选择的分页是每页5行数据  
 			pageList : [ 5, 10, 15, 20 ],//可以选择的分页集合
 			striped : true,//设置为true将交替显示行背景
 			collapsible : true,//显示可折叠按钮  
@@ -109,20 +111,91 @@
 		
 	}
 	
-	function addUser() {
+	//添加 和 修改 用户 共用的弹窗
+	function addUser(action, id) {
+		//默认是添加用户
+		var title = "添加用户";
+		var url = 'user_addUI.action';
+		
+		//如果传入的参数 action 是 edit, 则表示要修改用户
+		if(action == 'edit'){
+			title = "编辑用户";
+			url = 'user_editUI.action?id='+id;
+		}
+		
 		$('#dialog').dialog({
-		    title: '添加用户',
+		    title: title,
 		    width: 700,
 		    height: 350,
 		    closed: false,
 		    cache: false,
 		    resizable: true,
-		    content: '表单',
-		    //href: "${pageContext.request.contextPath}/saveUI.jsp",
-		    href: 'user_addUI.action',
+		    href: url,
 		    modal: true
 		});
 	}
+	
+	//删除用户，支持批量删除
+	function deleteUser(){
+		var $checkedRows = $('#dategrid').datagrid('getChecked');
+		
+		//如果没有选中要删除的行，提示错误并返回
+		if($checkedRows.length == 0){
+			$.messager.alert('删除记录','请选择要删除的行!','error');//不要用alert,用$.messager.alert，error表示这是个错误提示
+			return false;
+		} else {
+			$.messager.confirm('删除记录', '确定删除选中的行吗?', function(r){//确认框
+	        	if (r){//如果确认删除，就获取到删除的行的id，并个发送删除请求
+	        		var deleteIds = new Array();//要被删除的id数组
+	    			
+	        		//遍历将选中行的id加入deleteIds数组
+	    			$.each($checkedRows, function(key, val) {
+	    				deleteIds[key] = val.id;
+	    			});
+	    			console.log(deleteIds);
+	        		var postData = {'deletIds': deleteIds};
+	        		//ajax 请求删除选中的行
+	    			$.ajax({
+	    				url: 'user_delete.action',
+	    				type: 'POST',
+	    				data: postData,//删除的id
+	    				traditional: true,//传递数组是，一定要设置 traditional:true，
+	    								  //防止jquery深度序列化参数对象,即将数组参数转化为传统格式：deletIds=1&deletIds=2
+	    				async: true,//默认为true，代表异步请求；如果为false，代表同步请求
+	    				success: function(data){
+	    					$.messager.alert("删除记录",data,'info',function(){
+	    						location.reload(true);//显示信息后的回调函数：重新加载原页面
+	    					});
+	    				}
+	    			});//end of $.ajax
+	       		}// end of if
+	   		});//end of confirm
+		}//end of else
+	}//end of deleteUser
+	
+	//修改用户，一次只能修改一个用户
+	function editUser(){
+		var $checkedRows = $('#dategrid').datagrid('getChecked');
+		
+		//如果没有选中要修改的行，提示错误并返回
+		if($checkedRows.length == 0){
+			$.messager.alert('删除记录','请选择要修改的行!','error');//不要用alert,用$.messager.alert，error表示这是个错误提示
+			return false;
+		} else if($checkedRows.length > 1) {
+			$.messager.alert('修改记录','一次只能选中一行!','error');//不要用alert,用$.messager.alert，error表示这是个错误提示
+			return false;
+		} else {
+			console.log($checkedRows[0].id);
+			
+			/**
+			 * 修改页面和添加页面是一样的， 只不过修改页面可以回显数据，
+			 * 所以这里利用addUser()来显示修改页面
+			 * 传递到后台时，准备回显数据
+			 */
+			addUser('edit',$checkedRows[0].id);
+		}//end of if
+	}//end of editUser
+	
 </script>
 
 </body>

@@ -9,13 +9,13 @@
 			<tr>
 				<th><label for="loginName">用户名：</label></th>
 				<td>
-					<input class="easyui-validatebox" type="text" id="loginName" name="loginName"
+					<input class="easyui-validatebox" type="text" id="loginName" name="loginName" value="${loginName }"
 						data-options="required:true,validType:'loginName'"/>
 				</td>
 				
 				<th><label for="realName">真实姓名：</label></th>
 				<td>
-					<input class="easyui-validatebox" type="text" id="realName" name="realName"
+					<input class="easyui-validatebox" type="text" id="realName" name="realName" value="${realName }"
 						data-options="required:true,validType:'length[1,20]'" />
 				</td>
 			</tr>
@@ -78,7 +78,8 @@
             	<td colspan="4" style="text-align:right; padding-top:10px">
                 	<a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddOK" iconcls="icon-ok" 
                 		onclick="javascript:submitForm()">确定</a>
-                 	<a href="javascript:void(0)" class="easyui-linkbutton" id="btnCancel" iconcls="icon-cancel" >取消</a>
+                 	<a href="javascript:void(0)" class="easyui-linkbutton" id="btnCancel" iconcls="icon-cancel" 
+                 		onclick="javascript:closeDialog()">取消</a>
               	</td>
           	</tr>
 		</table>
@@ -105,7 +106,7 @@ function submitForm() {
 		},
 	    success:function(data){
 	    	$.messager.alert("添加信息",data,'info',function(){
-					location.reload(true);//显示信息后的回调函数：重新加载原页面
+				location.reload(true);//显示信息后的回调函数：重新加载原页面
 			});
 	    	$('#dialog').dialog('close');
 	    }
