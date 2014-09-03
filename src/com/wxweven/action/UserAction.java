@@ -48,33 +48,6 @@ public class UserAction extends BaseAction<User> {
 	private String sort;//排序的字段
 	private String order;//ASC 或者 desc
 	
-
-
-//
-//	/** 修改 */
-//	public String edit() throws Exception {
-//		// 1，从数据库中取出原对象
-//		User user = userService.getById(model.getId());
-//
-//		// 2，设置要修改的属性
-//		user.setLoginName(model.getLoginName());
-//		user.setName(model.getName());
-//		user.setGender(model.getGender());
-//		user.setPhoneNumber(model.getPhoneNumber());
-//		user.setEmail(model.getEmail());
-//		user.setDescription(model.getDescription());
-//		// >> 设置所属部门
-//		user.setDepartment(departmentService.getById(departmentId));
-//		// >> 设置关联的岗位
-//		List<Role> roleList = roleService.getByIds(roleIds);
-//		user.setRoles(new HashSet<Role>(roleList));
-//
-//		// 3，更新到数据库
-//		userService.update(user);
-//
-//		return "toList";
-//	}
-//
 //	/** 初始化密码为1234 */
 //	public String initPassword() throws Exception {
 //		// 1，从数据库中取出原对象
@@ -295,9 +268,38 @@ public class UserAction extends BaseAction<User> {
 		ActionContext.getContext().getValueStack().push(user);
 		if (user.getDepartment() != null) {
 			departmentId = user.getDepartment().getId();
+			ActionContext.getContext().getValueStack().push(departmentId);
 		}
 
-		return "addUI";
+		return "editUI";
+	}
+	
+	/** 修改 */
+	public String edit() throws Exception {
+		// 1. 从数据库中取出原对象
+		User user = userService.getById(model.getId());
+
+		logger.debug("user id is--------->"+model);
+		
+		// 2. 设置要修改的属性,但是有些属性，如loginName,realName，密码等不能直接修改
+		user.setGender(model.getGender());
+		user.setPhoneNumber(model.getPhoneNumber());
+		user.setEmail(model.getEmail());
+		user.setDescription(model.getDescription());
+		// >> 设置所属部门
+		user.setDepartment(departmentService.getById(departmentId));
+		/*// >> 设置关联的岗位
+		List<Role> roleList = roleService.getByIds(roleIds);
+		user.setRoles(new HashSet<Role>(roleList));*/
+
+		// 3. 更新到数据库
+		userService.update(user);
+
+		out.print("修改信息成功！");
+		out.flush();
+		out.close();
+		
+		return null;
 	}
 	
 	

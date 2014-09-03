@@ -6,33 +6,9 @@
 <div style="padding:10px;">
 	<form id="ffAdd" method="post" data-options="novalidate:true">
 		<table id="tblAdd" class="view">
-			<tr>
-				<th><label for="loginName">用户名：</label></th>
-				<td>
-					<input class="easyui-validatebox" type="text" id="loginName" name="loginName"
-						data-options="required:true, validType:'loginName', delay:800"/>
-				</td>
-				
-				<th><label for="realName">真实姓名：</label></th>
-				<td>
-					<input class="easyui-validatebox" type="text" id="realName" name="realName"
-						data-options="required:true,validType:'length[1,20]'" />
-				</td>
-			</tr>
-			
-			<tr>	
-				<th><label for="password">密码：</label></th>
-				<td><input class="easyui-validatebox" type="password" id="password" name="password"
-					data-options="required:true,validType:'length[6,20]'" /></td>
-				
-				<th><label for="repassword">确认密码：</label></th>
-				<td><input class="easyui-validatebox" type="password" id="repassword" name="repassword"
-					 required="true" missingMessage="请再次填写新密码" validType="equalTo['#password']" /></td>
-			</tr>
-			
 			<tr>	
 				<th><label for="departmentId">所属部门：</label></th>
-				<td><input class="easyui-validatebox" type="text" id="departmentId" name="departmentId" /></td>
+				<td><input class="easyui-validatebox" type="text" id="departmentId" name="departmentId" value="${departmentId }"/></td>
 				
 				<!-- <th><label for="userGroupId">所属用户组：</label></th>
 				<td><input class="easyui-validatebox" type="text" id="userGroupId" name="userGroupId"
@@ -61,17 +37,19 @@
 			<tr>
 				<th><label for="phoneNumber">电话号码：</label></th>
 				<td><input class="easyui-validatebox" type="text" id="phoneNumber" name="phoneNumber" 
-					data-options="required:true, validType:'mobile'"/></td>
+					data-options="required:true, validType:'mobile'" value="${phoneNumber }" /></td>
 
 				<th><label for="email">邮箱：</label></th>
 				<td><input class="easyui-validatebox" type="text" id="email" name="email" 
-					data-options="required:true, validType:'email'"/></td>
+					data-options="required:true, validType:'email'" value="${email }"/></td>
 
 			</tr>
 			
 			<tr>
 				<th><label for="description">备注：</label></th>
-				<td colspan="3"><textarea style="height:60px;width:500px" id="description" name="description"></textarea></td>
+				<td colspan="3">
+					<textarea style="height:60px;width:500px" id="description" name="description">${description }
+				</textarea></td>
 			</tr>
 			
 			<tr>
@@ -82,6 +60,7 @@
                  		onclick="javascript:closeDialog()">取消</a>
               	</td>
           	</tr>
+          	
 		</table>
 	</form>
 	
@@ -100,13 +79,15 @@ $(function(){
 });
 
 function submitForm() {
+	var id = ${id};//从当前值栈中拿User 对应的 id
+	
 	$('#ffAdd').form('submit', {
-		url: 'user_add.action',//指定提交的url
+		url: 'user_edit.action?id='+id,//指定修改用户的url,一定要传入id
 		onSubmit : function() {
 			return $(this).form('enableValidation').form('validate');
 		},
 	    success:function(data){
-	    	$.messager.alert("添加信息",data,'info',function(){
+	    	$.messager.alert("修改信息",data,'info',function(){
 				location.reload(true);//显示信息后的回调函数：重新加载原页面
 			});
 	    	$('#dialog').dialog('close');

@@ -5,6 +5,11 @@ $.extend($.fn.validatebox.defaults.rules,{
 		},
 		message : "用户名不合法（字母开头，6-16长度，允许字母数字下划线）"
 	},*/
+	test:{
+		validator : function(value) {
+		},
+		message : ''
+	},
 	realname : {// 验证姓名，可以是中文或英文
 		validator : function(value) {
 			return /^[u0391-uFFE5]+$/i.test(value)

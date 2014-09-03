@@ -185,7 +185,7 @@
 			$.messager.alert('修改记录','一次只能选中一行!','error');//不要用alert,用$.messager.alert，error表示这是个错误提示
 			return false;
 		} else {
-			console.log($checkedRows[0].id);
+			//console.log($checkedRows[0].id);
 			
 			/**
 			 * 修改页面和添加页面是一样的， 只不过修改页面可以回显数据，
