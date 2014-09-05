@@ -69,10 +69,23 @@
 			url : 'user_list.action',
 			columns : [ [ 
 				{field : 'ck', checkbox: true},//定义多选框 checkbox
-				{field : 'id', title : '用户id', width : 80, sortable : true},//sortable: true,允许点击表头排序
+				//sortable: true,允许点击表头排序,hidden:true,隐藏id列
+				{field : 'id', title : '用户id', width : 40, sortable : true},
 				{field : 'loginName', title : '用户名', width : 80, sortable : true}, 
+				{field : 'realName', title : '真实姓名', width : 80, sortable : true,
+					formatter: function(value,row,index){
+						
+						return "<a href='http://www.baidu.com/s?wd="+value+"' tartget='_top'>"+value+"</a>";
+						
+					}
+				},
+				{field : 'userState', title : '用户状态', width : 80, sortable : true},
+				{field : 'lastLoginTime', title : '最后登录时间', width : 100, sortable : true},
+				{field : 'gender', title : '性别', width : 80, sortable : true},
+				{field : 'phoneNumber', title : '电话号码', width : 80, sortable : true},
 				{field : 'email', title : '邮箱', width : 80, sortable : true},
-				{field : 'realName', title : '真实姓名', width : 80, sortable : true}
+				{field : 'description', title : '说明', width : 80, sortable : true}
+				
 			] ],
 			toolbar : toolbar,
 			resizeable : true,//宽度可调整

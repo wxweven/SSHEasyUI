@@ -1,11 +1,15 @@
 package com.wxweven.action;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JsonConfig;
+import net.sf.json.processors.JsDateJsonBeanProcessor;
+import net.sf.json.util.PropertyFilter;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.struts2.ServletActionContext;
@@ -15,6 +19,8 @@ import org.springframework.stereotype.Controller;
 import com.opensymphony.xwork2.ActionContext;
 import com.wxweven.base.BaseAction;
 import com.wxweven.domain.User;
+import com.wxweven.utils.JsonLibDateProcessor;
+import com.wxweven.utils.JsonLibUserProcessor;
 
 /**
  * 
@@ -184,14 +190,19 @@ public class UserAction extends BaseAction<User> {
 	public String list() throws Exception {
 		// 1. 根据分页，排序，查询条件等来获取用户列表
 		List<User> userList = userService.findAll(getPage(), getRows(), getSort(), getOrder(), getModelConditions());
+		
 		// 2. 获得符合条件的用户的总数(不带分页)
 		int totalCount = userService.totalCount();
 		
 		// 3. 过滤掉无关的关联属性"department", "userGroup"，否则容易引起死循环异常
 		JsonConfig config = new JsonConfig();
 		config.setExcludes(new String[] { "department", "userGroup" });
+		// 对从数据库中取回的字段过滤
+		config.registerJsonValueProcessor(Date.class, JsonLibDateProcessor.instance);
+		config.registerJsonValueProcessor(String.class, JsonLibUserProcessor.instance);
 
 		// 4. 根据list得到json字符串
+//		JSONArray jsonArray = JSONArray.fromObject(userList, config);
 		String resultStr = JSONArray.fromObject(userList, config).toString();
 
 		// 5. 包装json字符串，符合easyui要求
