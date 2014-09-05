@@ -50,7 +50,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 				+ " (select md.menuId from wxw_menu_dept md where md.deptId in "//
 				+ " (select u.departmentId from wxw_user u where loginName=:loginName))"//
 				+ " order by orderNum asc";
-//		logger.debug("topMenuSql:"+topMenuSql);
+		logger.debug("topMenuSql:"+topMenuSql);
 
 		Query sqlQuery = getSession().createSQLQuery(topMenuSql)//
 				.setParameter("loginName", loginName)//

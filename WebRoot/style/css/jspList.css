@@ -15,3 +15,35 @@
 	font-weight: bold;
 	color: #FF5317
 }
+
+.searchinput {
+	width: 200px;
+}
+
+table.view {
+	border: 1px solid #A8CFEB;
+	border-collapse: collapse;
+	margin-bottom: 5px;
+}
+
+.view th {
+	padding: 5px;
+	height: 23px;
+	width: 150px;
+	border: 1px solid silver;
+	background-color: #F1F6FF;
+	font-weight: normal;
+	text-align: right;
+}
+
+.view td {
+	padding: 5px;
+	height: 23px;
+	width: 150px;
+	border: 1px solid silver;
+	background-color: #FAFCFF;
+}
+
+.alignright {
+	text-align: right;
+}

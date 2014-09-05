@@ -63,7 +63,7 @@ public interface BaseService<T> {
 	List<T> getByIds(Integer[] ids);
 
 	/**
-	 * 查询所有
+	 * 查询所有,可以分页，排序，where条件
 	 * @param page
 	 * @param rows
 	 * @param orderColumn
@@ -73,7 +73,7 @@ public interface BaseService<T> {
 	List<T> findAll(String page, String rows, String orderColumn, String order, Map<String, Object> conditions);
 	
 	/**
-	 * 查询所有记录的条数
+	 * 查询所有记录的条数，没有分页限制，有where条件
 	 * @return
 	 */
 	int totalCount();

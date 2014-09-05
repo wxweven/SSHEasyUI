@@ -66,7 +66,7 @@
 		<!-- 用户管理 -->
 		<action name="user_*" class="userAction" method="{1}">
 			<result name="list">/WEB-INF/jsp/userAction/list.jsp</result>
-			<!-- <result name="addUI">/WEB-INF/jsp/userAction/addUI.jsp</result> -->
+			<result name="onlineList">/WEB-INF/jsp/userAction/onlineList.jsp</result>
 			<result name="{1}">/WEB-INF/jsp/userAction/{1}.jsp</result>
 			<!-- <result name="toList" type="redirectAction">user_list</result> -->
 			
