@@ -1,0 +1,8 @@
+第一章 项目约定
+
+（一）关于编码
+    项目统一用 utf-8 编码。包括Java文件，jsp文件，html/xml，数据库连接等，统一使用 utf-8 编码。具体设置如下：
+    
+    （1）MyEclipse配置：将MyEclipse的workspace工作空间编码设置为 utf-8 ：
+        windows --> Perferences--> General --> workspace 里面的 text file encoding设置为utf-8：
+        
