@@ -18,7 +18,6 @@ import com.wxweven.base.BaseServiceImpl;
 import com.wxweven.domain.User;
 import com.wxweven.service.UserService;
 
-@Transactional
 @Service("userService")
 public class UserServiceImpl extends BaseServiceImpl<User> implements UserService {
 

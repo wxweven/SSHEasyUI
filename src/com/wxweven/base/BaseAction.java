@@ -102,8 +102,10 @@ public abstract class BaseAction<T> extends ActionSupport implements ModelDriven
 	// =============== Service实例的声明 ==================
 //	@Resource
 //	protected RoleService roleService;
+	
 	@Resource
-	protected DepartmentService departmentService;
+	protected DepartmentService departmentService; // 注入 departmentService
+	
 	@Resource
 	protected UserService userService;
 //	@Resource

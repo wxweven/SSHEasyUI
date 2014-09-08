@@ -21,7 +21,6 @@ import com.wxweven.service.DepartmentService;
  * @Copyright: Copyright (c) wxweven 2014
  * @Description: DepartmentService 的实现类
  */
-@Transactional
 @Service("departmentService")
 public class DepartmentServiceImpl extends BaseServiceImpl<Department> implements DepartmentService {
 
