@@ -323,6 +323,15 @@ public class UserAction extends BaseAction<User> {
 		return null;
 	}
 	
+	/** 导出Excel */
+	public String export() throws Exception {
+		logger.debug("111111111111");
+		//1. 生成Excel
+		userService.excelWriter();
+		return null;
+	}
+	
+	
 //===============在线用户管理============
 	/** 默认显示onlineList.jsp页面 */
 	public String toOnlineList() throws Exception {

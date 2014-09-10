@@ -79,6 +79,11 @@ public interface BaseService<T> {
 	int totalCount();
 	
 	/**
+	 * 根据查询条件，生成Excel
+	 */
+	void excelWriter();
+	
+	/**
 	 * 根据SQL来执行Query，并返回Hibernate执行后的Query
 	 * @param sql
 	 * @return
