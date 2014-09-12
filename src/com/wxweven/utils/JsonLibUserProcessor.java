@@ -15,7 +15,11 @@ public class JsonLibUserProcessor implements JsonValueProcessor {
 		if (value == null) {
 			return "";
 		} else if(key.equals("userState")){//对 userState 属性过滤
-			return 1;
+			
+			if(value.equals("可用"))
+				return 1; 
+			else
+				return 0;
 		}
 		
 		return value.toString();

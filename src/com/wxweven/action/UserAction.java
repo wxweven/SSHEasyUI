@@ -326,6 +326,7 @@ public class UserAction extends BaseAction<User> {
 	/** 导出Excel */
 	public String export() throws Exception {
 		logger.debug("111111111111");
+		String filename = ServletActionContext.getServletContext().getRealPath(".");//当前类路径
 		//1. 生成Excel
 		userService.excelWriter();
 		return null;

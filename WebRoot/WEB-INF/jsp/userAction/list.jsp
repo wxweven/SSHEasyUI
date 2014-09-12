@@ -72,8 +72,8 @@
 				{field : 'realName', title : '真实姓名', width : 80, sortable : true,
 					formatter: function(value,row,index){
 						
-						return "<a href='"+value+"' tartget='_top'>"+value+"</a>";
-						//return "<a href='http://www.baidu.com/s?wd="+value+"' tartget='_top'>"+value+"</a>";
+						//return "<a href='"+value+"' tartget='_top'>"+value+"</a>";
+						return "<a href='http://www.baidu.com/s?wd="+value+"' tartget='_top'>"+value+"</a>";
 						
 					}
 				},

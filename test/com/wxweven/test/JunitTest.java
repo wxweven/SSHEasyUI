@@ -59,6 +59,13 @@ public class JunitTest {
 		return sessionFactory.openSession();
 	}
 	
+	/** 测试sessionFactory，生成数据库表 */
+	@Test
+	public void testSessionFactory(){
+		logger.debug(sessionFactory);
+	}
+	
+	
 	@Test
 	public void testfff(){
 		String str = "[,{111111";
@@ -188,11 +195,6 @@ public class JunitTest {
 		list.add("4444");
 		
 		logger.debug(JSONArray.fromObject(list));
-	}
-	
-	@Test
-	public void testSessionFactory(){
-		logger.debug(sessionFactory);
 	}
 	
 	/**
