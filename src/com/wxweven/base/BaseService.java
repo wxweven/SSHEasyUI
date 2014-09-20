@@ -25,7 +25,7 @@ public interface BaseService<T> {
 	void save(T entity);
 
 	/**
-	 * 删除实体
+	 * 根据id删除实体
 	 * 
 	 * @param id
 	 */
@@ -39,7 +39,7 @@ public interface BaseService<T> {
 	void update(T entity);
 
 	/**
-	 * 查询实体
+	 * 根据id(Integer类型)查询实体
 	 * 
 	 * @param id Integer类型
 	 * @return
@@ -47,7 +47,7 @@ public interface BaseService<T> {
 	T getById(Integer id);
 	
 	/**
-	 * 查询实体
+	 * 根据id(String类型)查询实体
 	 * 
 	 * @param id String 类型
 	 * @return
@@ -55,13 +55,27 @@ public interface BaseService<T> {
 	T getById(String id);
 
 	/**
-	 * 查询实体
+	 * 根据ids数组(Integer[]类型)查询实体
 	 * 
-	 * @param ids
+	 * @param ids Integer[]类型
 	 * @return
 	 */
 	List<T> getByIds(Integer[] ids);
+	
+	/**
+	 * 根据ids数组(String[]类型)查询实体
+	 * 
+	 * @param ids String[]类型
+	 * @return
+	 */
+	List<T> getByIds(String[] ids);
 
+	/**
+	 * 查询所有，没有where条件，也没有分页等
+	 * @return
+	 */
+	List<T> findAll();
+	
 	/**
 	 * 查询所有,可以分页，排序，where条件
 	 * @param page

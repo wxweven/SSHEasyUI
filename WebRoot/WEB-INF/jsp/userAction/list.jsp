@@ -7,8 +7,8 @@
     <title>${jspGridTitle}</title>
 
 	<script type="text/javascript">
-	   $(function(){
-		   $("#searchTable tr td:even").addClass("alignright");//让 偶数 的 td 向右靠齐
+		$(function(){
+			$("#searchTable tr td:even").addClass("alignright");//让 偶数 的 td 向右靠齐
 	   });
 	</script>    
 </head>
@@ -19,9 +19,9 @@
 	        <tr>
 	            <td>用户id:</td>
 	            <td><input name="id" id="userid" class="searchinput easyui-textbox" /></td>
-	            <td>用户名loginName:</td>
+	            <td>用户名:</td>
 	            <td ><input name="loginName" id="loginName" class="searchinput easyui-textbox" /></td>
-	            <td >邮箱Dmail:</td>
+	            <td >邮箱:</td>
 	            <td><input name="email" id="email" class="searchinput easyui-textbox" /></td>
 	        </tr>
 	        <tr>
@@ -69,9 +69,34 @@
 				//sortable: true,允许点击表头排序,hidden:true,隐藏id列
 				{field : 'id', title : '用户id', width : 40, sortable : true},
 				{field : 'loginName', title : '用户名', width : 80, sortable : true}, 
+				{field : 'deptName', title : '所属部门', width : 80, sortable : true,
+					formatter:function(value,row,index){
+					    if(row.department != null)
+							return row.department.name;
+					    else
+					    	return "";
+					}
+				}, 
+				{field : 'roles', title : '角色', width : 100, sortable : true,
+					formatter:function(value,row,index){
+						var roleName = '';
+					    if(row.roles && row.roles.length > 0){
+					    	$.each(row.roles,function(key,val) {
+					    		if(key != 0) {
+					    			roleName += ', ';
+					    		}
+					    		roleName += val.name;
+					    	});
+							return roleName;
+					    }
+					    else {
+					    	return "暂无";
+					    }
+					}
+				}, 
+				
 				{field : 'realName', title : '真实姓名', width : 80, sortable : true,
 					formatter: function(value,row,index){
-						
 						//return "<a href='"+value+"' tartget='_top'>"+value+"</a>";
 						return "<a href='http://www.baidu.com/s?wd="+value+"' tartget='_top'>"+value+"</a>";
 						
@@ -99,8 +124,6 @@
 			//singleSelect: true,//只能选中单行
 			showFooter: true,
 			rownumbers : true//显示行号
-		//行数 
-
 		});
 	});
 
@@ -190,7 +213,7 @@
 		
 		//如果没有选中要修改的行，提示错误并返回
 		if($checkedRows.length == 0){
-			$.messager.alert('删除记录','请选择要修改的行!','error');//不要用alert,用$.messager.alert，error表示这是个错误提示
+			$.messager.alert('修改记录','请选择要修改的行!','error');//不要用alert,用$.messager.alert，error表示这是个错误提示
 			return false;
 		} else if($checkedRows.length > 1) {
 			$.messager.alert('修改记录','一次只能选中一行!','error');//不要用alert,用$.messager.alert，error表示这是个错误提示

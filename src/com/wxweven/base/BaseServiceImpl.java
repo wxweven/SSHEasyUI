@@ -1,13 +1,9 @@
 package com.wxweven.base;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -81,10 +77,25 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 				.list();
 	}
 
-	/**
-	 * 查询所有 可以分页，可以排序，可以按条件查询
-	 * @return
-	 */
+	public List<T> getByIds(String[] ids) {
+		if (ids == null || ids.length == 0) {
+			return Collections.EMPTY_LIST;
+		}
+
+		String hql = "FROM " + clazz.getSimpleName() + " WHERE id IN(:ids)";
+		return getSession().createQuery(hql)//
+				.setParameterList("ids", ids)//
+				.list();
+	}
+	
+	@Override
+	public List<T> findAll() {
+		return getSession().createQuery(//
+				"FROM " + clazz.getSimpleName())//
+				.list();
+	}
+	
+	@Override
 	public List<T> findAll(String page, String rows, String orderColumn, String order, Map<String, Object> conditions) {
 		int currentPage = Integer.parseInt((page == null || page == "0") ? "1" : page);// 第几页
 		int pageSize = Integer.parseInt((rows == null || rows == "0") ? "10" : rows);// 每页多少行
@@ -92,6 +103,7 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 		String hql = "FROM " + clazz.getSimpleName() + " t where 1=1 ";
 		
 		List<String> keys = new ArrayList<String>();
+//		logger.debug("conditions--------:"+conditions);
 		//如果查询条件 map 不为空
 		if((conditions != null) && !conditions.isEmpty()) {
 			for(String key : conditions.keySet()) {
@@ -104,7 +116,7 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 		
 		hql += " order by " + orderColumn + " " + order;//加上排序条件
 		
-		logger.debug("findAll hql:" + hql);
+//		logger.debug("findAll hql:" + hql);
 		
 		Query query = getSession().createQuery(hql);
 		
@@ -126,9 +138,6 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 				
 	}
 	
-	/**
-	 * 查询满足条件的所有记录的条数
-	 */
 	@Override
 	public int totalCount() {
 		return this.getTotalCount();
@@ -224,6 +233,4 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 	public void setTotalCount(int totalCount) {
 		this.totalCount = totalCount;
 	}
-	
-	
 }

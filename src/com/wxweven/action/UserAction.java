@@ -1,11 +1,17 @@
 package com.wxweven.action;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JsonConfig;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.struts2.ServletActionContext;
@@ -14,9 +20,11 @@ import org.springframework.stereotype.Controller;
 
 import com.opensymphony.xwork2.ActionContext;
 import com.wxweven.base.BaseAction;
+import com.wxweven.domain.Role;
 import com.wxweven.domain.User;
-import com.wxweven.utils.JsonLibDateProcessor;
-import com.wxweven.utils.JsonLibUserProcessor;
+//import com.wxweven.utils.JsonLibDateProcessor;
+//import com.wxweven.utils.JsonLibUserProcessor;
+import com.wxweven.utils.CommonUtils;
 
 /**
  * 
@@ -38,9 +46,9 @@ public class UserAction extends BaseAction<User> {
 	private String usercaptcha;// 验证码参数
 	private String newPass;// 用户需要更改的新密码
 
-	/** 与 User 关联的 Department 以及 UserGroup，只需要持有 id 属性 */
+	/** 与 User 关联的 Department 以及 Role，只需要持有 id 属性 */
 	private String departmentId;
-	private String userGroupId;
+	private Integer[] roleIds;
 
 	private Integer[] deletIds;// 要被删除的记录的id
 	private Integer[] initPasswdIds;// 要被初始化密码的记录的id
@@ -51,7 +59,7 @@ public class UserAction extends BaseAction<User> {
 	private String sort;// 排序的字段
 	private String order;// ASC 或者 desc
 
-//============用户登录相关============
+	// ============用户登录相关============
 	/** 登录页面 */
 	public String loginUI() throws Exception {
 		return "loginUI";
@@ -71,7 +79,6 @@ public class UserAction extends BaseAction<User> {
 
 		// 2. 检查用户名和密码是否正确
 		User user = userService.findByLoginNameAndPassword(model.getLoginName(), model.getPassword());
-		logger.debug("user：" + user);
 		if (user == null) {
 			returnMesg = "用户名或密码不正确！";
 			out.print(returnMesg);
@@ -81,8 +88,8 @@ public class UserAction extends BaseAction<User> {
 		} else {
 			// 1. 将登录用户存入 session
 			ActionContext.getContext().getSession().put("user", user);
-//			ActionContext.getContext().getApplication().put("user", );
-			
+			// ActionContext.getContext().getApplication().put("user", );
+
 			// 2. 更改用户的登录时间为当前时间
 			user.setLastLoginTime(new Date());
 			userService.update(user);// 将更改同步到数据库
@@ -145,7 +152,7 @@ public class UserAction extends BaseAction<User> {
 
 		return null;
 	}
-	
+
 	/** 初始化密码为123456 */
 	public String initPasswd() throws Exception {
 
@@ -169,7 +176,7 @@ public class UserAction extends BaseAction<User> {
 		return null;
 	}
 
-//===============用户菜单=================
+	// ===============用户菜单=================
 	/**
 	 * 获取登录用户的菜单列表，返回 json
 	 */
@@ -179,7 +186,7 @@ public class UserAction extends BaseAction<User> {
 		User user = (User) request.getSession().getAttribute("user");
 		if (user != null) {
 			// 2. 根据user 来获取菜单
-			menus = userService.getUserMenu(user);
+			menus = sysMenuService.getSysMenuTree(user);
 		}
 
 		// 3. 返回用户菜单
@@ -190,45 +197,105 @@ public class UserAction extends BaseAction<User> {
 		return null;
 	}
 
-//=================用户管理================	
+	// =================用户管理================
 	/** 默认显示list.jsp页面 */
 	public String toList() throws Exception {
 		ActionContext.getContext().put("jspGridTitle", "用户列表");
+
 		return "list";
 	}
-	
+
 	/** 获取用户列表数据 */
 	public String list() throws Exception {
-		// 1. 根据分页，排序，查询条件等来获取用户列表
-		List<User> userList = userService.findAll(getPage(), getRows(), getSort(), getOrder(), getModelConditions());
+		// 1. 最终的结果集jsonMap
+		Map<String, Object> jsonMap = new HashMap<String, Object>();
 
-		// 2. 获得符合条件的用户的总数(不带分页)
+		// 2. 根据分页，排序，查询条件等来获取用户列表
+		List<User> userList = userService.findAll(page, rows, sort, order, getModelConditions());
+
+		// 3. 获得符合条件的用户的总数(不带分页)
 		int totalCount = userService.totalCount();
 
-		// 3. 过滤掉无关的关联属性"department", "userGroup"，否则容易引起死循环异常
-		JsonConfig config = new JsonConfig();
-		config.setExcludes(new String[] { "department", "userGroup" });
-		// 对从数据库中取回的字段过滤
-		config.registerJsonValueProcessor(Date.class, JsonLibDateProcessor.instance);
-		config.registerJsonValueProcessor(String.class, JsonLibUserProcessor.instance);
+		/**
+		 * 一楼献给 http://www.lihuoqing.cn/code/967.html
+		 * 
+		 * 4.这一步必须,不然会造成死循环, 导致 stackoverflow, 这一点深深感谢
+		 * http://www.lihuoqing.cn/code/967.html ,在这篇博客上找到了解决方法
+		 * 
+		 * 获得User关联的 Department 以及 Role,但是不需要其他的附加属性 同时，让 User 关联的 Department
+		 * 再关联的 Users 为空，不然又关联回自己，没完没了了 同理，让 Department 关联的 上级部门
+		 * ，下级部门都为空(不需要取出的属性，都给他设置为空) User 所关联的 Role 一样处理。。。。。
+		 */
+		for (User user : userList) {
+			// 单纯地获得Department本身，所以过滤掉Department关联的其他东西
+			user.getDepartment().setUsers(null);
+			user.getDepartment().setChildren(null);
+			user.getDepartment().setParent(null);
 
-		// 4. 根据list得到json字符串
-		// JSONArray jsonArray = JSONArray.fromObject(userList, config);
-		String resultStr = JSONArray.fromObject(userList, config).toString();
+			// Role的处理同Department
+			for (Role role : user.getRoles()) {
+				role.setUsers(null);
+				role.setSysMenus(null);
+			}
+		}
 
-		// 5. 包装json字符串，符合easyui要求
-		resultStr = wrapReturnJsonStr(resultStr, totalCount);
+		// 5. 构建 jsonMap
+		jsonMap.put("rows", userList);
+		jsonMap.put("total", totalCount);
 
-		logger.debug("userList--->" + resultStr);
+		/**
+		 * 6.将jsonMap序列化成JSONString，利用阿里巴巴的fastjson，吊的一笔
+		 * SerializerFeature.DisableCircularReferenceDetect: 禁止循环引用检测
+		 */
+		String jsonString = JSON.toJSONString(jsonMap, SerializerFeature.DisableCircularReferenceDetect);
+		// String jsonString = JSON.toJSONString(jsonMap);
+		logger.debug("---->jsonString:" + jsonString);
 
-		// 6. 返回数据给前台
-		out.print(resultStr);
+		// 7. 返回数据给前台
+		out.print(jsonString);
 		out.flush();
 		out.close();
 
-		// 7. 由于直接返回数据给前台，而不需要跳转页面，这里直接返回null
+		// 8. 由于直接返回数据给前台，而不需要跳转页面，这里直接返回null
 		return null;// 返回 null 表示不用跳转页面
 	}
+
+	/** 获取用户列表数据 */
+	// public String list() throws Exception {
+	// // 1. 根据分页，排序，查询条件等来获取用户列表
+	// List<User> userList = userService.findAll(page, rows, sort, order,
+	// getModelConditions());
+	//
+	// // 2. 获得符合条件的用户的总数(不带分页)
+	// int totalCount = userService.totalCount();
+	//
+	// // 3. 过滤掉无关的关联属性"department", "roles"，否则容易引起死循环异常
+	// JsonConfig config = new JsonConfig();
+	// config.setExcludes(new String[] { "department", "roles" });
+	// // 对从数据库中取回的字段过滤
+	// // config.registerJsonValueProcessor(Date.class,
+	// JsonLibDateProcessor.instance);
+	// // config.registerJsonValueProcessor(String.class,
+	// JsonLibUserProcessor.instance);
+	//
+	// // 4. 根据list得到json字符串
+	// // JSONArray jsonArray = JSONArray.fromObject(userList, config);
+	// String resultStr = JSONArray.fromObject(userList, config).toString();
+	// // String resultStr = JSONArray.fromObject(userList).toString();
+	//
+	// // 5. 包装json字符串，符合easyui要求
+	// resultStr = wrapReturnJsonStr(resultStr, totalCount);
+	//
+	// logger.debug("新userList--->" + resultStr);
+	//
+	// // 6. 返回数据给前台
+	// out.print(resultStr);
+	// out.flush();
+	// out.close();
+	//
+	// // 7. 由于直接返回数据给前台，而不需要跳转页面，这里直接返回null
+	// return null;// 返回 null 表示不用跳转页面
+	// }
 
 	/** 添加页面 */
 	public String addUI() throws Exception {
@@ -240,7 +307,13 @@ public class UserAction extends BaseAction<User> {
 		// 封装到对象中（当model是实体类型时，也可以使用model，但要设置未封装的属性）
 		// >> 设置所属部门
 		model.setDepartment(departmentService.getById(departmentId));
-		// >> 设置关联的用户组
+
+		// >> 设置关联的角色
+//		String[] roleIdArr = roleIds.split(",");// 获得前台传过来的id，用逗号分割后的数组
+//		Integer[] roleIdIntArr = CommonUtils.stringArr2IntArr(roleIds);// 将String数组转成Integer数组
+		model.setRoles(new HashSet<Role>(roleService.getByIds(roleIds)));
+
+		logger.debug("角色对应的ids:" + Arrays.asList(roleIds));
 
 		// >> 密码要使用MD5摘要加密
 		String md5Digest = DigestUtils.md5Hex(model.getPassword());
@@ -322,31 +395,29 @@ public class UserAction extends BaseAction<User> {
 
 		return null;
 	}
-	
+
 	/** 导出Excel */
 	public String export() throws Exception {
 		logger.debug("111111111111");
-		String filename = ServletActionContext.getServletContext().getRealPath(".");//当前类路径
-		//1. 生成Excel
+		String filename = ServletActionContext.getServletContext().getRealPath(".");// 当前类路径
+		// 1. 生成Excel
 		userService.excelWriter();
 		return null;
 	}
-	
-	
-//===============在线用户管理============
+
+	// ===============在线用户管理============
 	/** 默认显示onlineList.jsp页面 */
 	public String toOnlineList() throws Exception {
 		ActionContext.getContext().put("jspGridTitle", "在线用户列表");
 		return "onlineList";
 	}
-	
+
 	public String onlineList() throws Exception {
 		List<User> userList = new ArrayList<User>();
-		logger.debug("---------3333-----------"+ActionContext.getContext().getApplication());
-		
+		logger.debug("---------3333-----------" + ActionContext.getContext().getApplication());
+
 		return null;
 	}
-	
 
 	// ---getters and setters
 
@@ -406,12 +477,12 @@ public class UserAction extends BaseAction<User> {
 		this.departmentId = departmentId;
 	}
 
-	public String getUserGroupId() {
-		return userGroupId;
+	public Integer[] getRoleIds() {
+		return roleIds;
 	}
 
-	public void setUserGroupId(String userGroupId) {
-		this.userGroupId = userGroupId;
+	public void setRoleIds(Integer[] roleIds) {
+		this.roleIds = roleIds;
 	}
 
 	public Integer[] getDeletIds() {

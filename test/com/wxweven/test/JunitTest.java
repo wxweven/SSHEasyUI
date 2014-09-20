@@ -12,7 +12,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import net.sf.json.JSONArray;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.logging.Log;
@@ -30,7 +29,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.wxweven.domain.Department;
 import com.wxweven.domain.SysMenu;
 import com.wxweven.domain.User;
-import com.wxweven.domain.UserGroup;
 
 public class JunitTest {
 	/**
@@ -122,81 +120,6 @@ public class JunitTest {
 	}
 	
 	
-	@Test
-	public void getMenusByDept(){
-		session.beginTransaction();
-		// --------------------------------------------
-	
-//		String hql = "select new list(u.loginName, u.userState) from User u where u.id=:id ";//返回list
-//		String hql = "select new map(u.loginName as loginName, u.userState as user_state) from User u where u.id=:id ";
-//		String hql = "select t.userName,t.age from TestDomain t where id=1";
-//		Query query = session.createQuery(hql)//
-//				.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP);
-//		List result = query.list();
-		StringBuilder resultStr = new StringBuilder();// 定义最终返回的 json 格式的字符串
-		
-		// 根据登录的用户名loginName，获取该用户对应的顶级菜单
-		String topMenuSql = "select a.id,a.name,a.icon,a.url from wxw_sys_menu a where a.id in "//
-				+ " (select md.menuId from wxw_menu_dept md where md.deptId in "//
-				+ " (select u.departmentId from wxw_user u where loginName=:loginName))"//
-				+ " order by orderNum asc";
-		logger.debug("topMenuSql---->"+topMenuSql);
-
-		Query sqlQuery = getSession().createSQLQuery(topMenuSql)//
-				.setParameter("loginName", "admin")//
-				.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP);
-
-		List resultList = sqlQuery.list();
-
-		if (!(resultList == null || resultList.size() == 0)) {
-			for (int i = 0; i < resultList.size(); i++) {
-				// 这里返回的 resultList 本身就类似于 Map，所以强转不会粗问题~~
-				Map resultMap = (Map) resultList.get(i);
-				// logger.debug("menu_icon:"+resultMap.get("menu_icon"));
-				if (0 == i) {
-					resultStr.append("{'menus':[");
-				}
-				resultStr.append("{'id':'" + resultMap.get("id") + "',");
-				resultStr.append("'icon':'" + resultMap.get("icon") + "',");
-				resultStr.append("'name':'" + resultMap.get("name") + "',");
-				resultStr.append("'menus':");
-				String subMenuSql = "select a.id,a.name,a.icon,a.url from wxw_sys_menu a "//
-						+ " where a.level = :level and a.parentId = :pId";
-				List resultSubMenuList = getSession().createSQLQuery(subMenuSql)//
-						.setParameter("level", 2)//
-						.setParameter("pId", resultMap.get("id"))//
-						.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)//
-						.list();
-				resultStr.append(JSONArray.fromObject(resultSubMenuList));
-
-				if (i != (resultList.size() - 1)) {
-					resultStr.append("},");
-				}
-
-				if (i == (resultList.size() - 1)) {
-					resultStr.append("}]}");
-				}
-			}
-		}
-
-		logger.debug("jsonMenus:" + resultStr);
-		
-		// --------------------------------------------
-		session.getTransaction().commit();
-		session.close();
-	}
-	
-	@Test
-	public void testJSONArray(){
-		List<String> list = new ArrayList<String>();
-		list.add("111");
-		list.add("2222");
-		list.add("3333");
-		list.add("4444");
-		
-		logger.debug(JSONArray.fromObject(list));
-	}
-	
 	/**
 	 * 添加用户
 	 */
@@ -205,11 +128,9 @@ public class JunitTest {
 		session.beginTransaction();
 		// --------------------------------------------
 		Department dept = (Department) session.load(Department.class, "1");
-		UserGroup userGroup = (UserGroup) session.load(UserGroup.class, "1");
 		
 		User user = new User();
 		user.setDepartment(dept);
-		user.setUserGroup(userGroup);
 		user.setLoginName("admin");
 		user.setPassword(DigestUtils.md5Hex("admin"));
 		user.setUserState("可用");

@@ -3,6 +3,7 @@
 <HEAD>
     <TITLE>没有权限</TITLE>
     <%@include file="/WEB-INF/jsp/public/commons.jspf" %>
+    <link href="${pageContext.request.contextPath}/style/css/pageCommon.css" type="text/css" rel="stylesheet" />
 </HEAD>   
 <BODY>
 
@@ -30,7 +31,7 @@
         
         <!-- 操作 -->
         <DIV ID="InputDetailBar">
-            <A HREF="javascript:history.go(-1);"><IMG SRC="${pageContext.request.contextPath}/style/images/goBack.png"/></A>
+            <A HREF="javascript:location.reload(true);"><IMG SRC="${pageContext.request.contextPath}/style/images/goBack.png"/></A>
         </DIV>
 </DIV>
 

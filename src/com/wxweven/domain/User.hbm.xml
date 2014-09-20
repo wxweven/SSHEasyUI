@@ -23,8 +23,11 @@
 		<!-- department属性，本类与Department的多对一 -->
 		<many-to-one name="department" class="Department" column="departmentId" />
 		
-		<!-- userGroup属性，本类与UserGroup的多对一 -->
-		<many-to-one name="userGroup" class="UserGroup" column="userGroupId" cascade="save-update"/>
+		<!-- roles属性，本类与Role的多对多 -->
+		<set name="roles" table="wxw_user_role" lazy="false">
+			<key column="userId"></key>
+			<many-to-many class="Role" column="roleId"></many-to-many>
+		</set>
 		
 	</class>
 

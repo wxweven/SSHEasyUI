@@ -73,6 +73,12 @@
 			<result name="toIndex" type="redirect">/index.jsp</result>
 		</action>
 		
+		<!-- 角色管理 -->
+		<action name="role_*" class="roleAction" method="{1}">
+			<result name="list">/WEB-INF/jsp/roleAction/list.jsp</result>
+			<result name="{1}">/WEB-INF/jsp/roleAction/{1}.jsp</result>
+		</action>
+		
 		<!-- 部门管理 -->		
 		<action name="department_*" class="departmentAction" method="{1}">
 			<result name="list">/WEB-INF/jsp/userAction/list.jsp</result>

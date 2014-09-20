@@ -17,7 +17,7 @@ public class DepartmentAction extends BaseAction<Department> {
 	private static final long serialVersionUID = 2894678137860541838L;
 
 	public String getDepartmentTree() throws Exception {
-		String deptTree = departmentService.getDepartmentMTree();
+		String deptTree = departmentService.getDepartmentTree();
 
 		out.print(deptTree);
 		out.flush();

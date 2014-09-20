@@ -39,7 +39,7 @@ function checkLogin(){
 	});
 	
 	//发送 ajax 的 post 请求给服务器，验证登录信息
-	var loginCheckUrl = "user_login.action";
+	var loginCheckUrl = "user_login" + actionExtension;
 	var postData = {'loginName': loginName, 'password': password, 'usercaptcha': usercaptcha};
 	
 	$.ajax({
@@ -65,7 +65,7 @@ function callback(data){
 	$(document).ready(function(){
 		if(data ==('success'))
 		{
-			window.location.href="home_frame.action";
+			window.location.href="home_frame" + actionExtension;
 		} else {
 			$.unblockUI();
 			changeCode();

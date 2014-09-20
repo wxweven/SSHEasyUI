@@ -27,18 +27,18 @@ public class DepartmentServiceImpl extends BaseServiceImpl<Department> implement
 	@Transactional(readOnly=true,
 			isolation=Isolation.READ_COMMITTED)
 	@Override
-	public String getDepartmentMTree() {
+	public String getDepartmentTree() {
 		
 		String hql = "from Department where parentId is null";//获取顶级部门
 		Query query = getSession().createQuery(hql);
 		List resultList = query.list();
 		Department topDept = (Department) resultList.get(0);
 		
-		return getDepartmentMTree(topDept);
+		return getDepartmentTree(topDept);
 	}
 	
 	@Override
-	public String getDepartmentMTree(Department dept) {
+	public String getDepartmentTree(Department dept) {
 		StringBuilder treeJsonStr = new StringBuilder();// 定义最终返回的 json 格式的字符串
 		treeJsonStr.append("[");
 

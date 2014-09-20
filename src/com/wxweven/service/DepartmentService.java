@@ -9,14 +9,14 @@ public interface DepartmentService extends BaseService<Department> {
 	 * 得到整个Department的树状结构
 	 * @return
 	 */
-	String getDepartmentMTree();
+	String getDepartmentTree();
 	
 	/**
 	 * 得到指定部门的部门树 
 	 * @param dept 指定的部门
 	 * @return
 	 */
-	String getDepartmentMTree(Department dept);
+	String getDepartmentTree(Department dept);
 	
 	
 }

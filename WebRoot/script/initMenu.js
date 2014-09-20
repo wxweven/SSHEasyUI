@@ -2,257 +2,259 @@
  * @date 2014/08/25
  * @author wxweven
  */
-var $_menus = null;//全局变量，用于获取菜单
+var $_menus = null;// 全局变量，用于获取菜单
 
-$(function(){
-    getMenu();
+$(function() {
+	getMenu();
+//	console.log(actionExtension+"-----");//测试js全局变量
 });
 
-//通过 Ajax请求，获取菜单json
-function getMenu() {   
+// 通过 Ajax请求，获取菜单json
+function getMenu() {
 	tabClose();
 	tabCloseEven();
-	
+
 	$.ajax({
-		url: 'user_menu.action',
-		type: 'POST',
-		async: false,//默认为true，代表异步请求；如果为false，代表同步请求
-//		dataType: 'json',//预期服务器返回的数据类型为 json
-		success: function(data){
-//			console.log(data);
-//			$_menus = data;
-			$_menus = eval("("+data+")");
-			InitLeftMenu();//左边的用户菜单
-			InitRightMenu();//右边的欢迎页面
-			
+		url : 'user_menu.action',
+		type : 'POST',
+		async : false,// 默认为true，代表异步请求；如果为false，代表同步请求
+		// dataType: 'json',//预期服务器返回的数据类型为 json
+		success : function(data) {
+			// console.log(data);
+			// $_menus = data;
+			$_menus = eval("(" + data + ")");
+			InitLeftMenu();// 左边的用户菜单
+			InitRightMenu();// 右边的欢迎页面
+
 			$("#pageloading").hide();
 		}
 	});
-	
-}   
 
-//初始化左侧  菜单显示
+}
+
+// 初始化左侧 菜单显示
 function InitLeftMenu() {
-//	$("#nav").accordion({animate:true});//定义当延伸或者折叠面板时是否显示动画效果。 默认为true 
-    
+	// $("#nav").accordion({animate:true});//定义当延伸或者折叠面板时是否显示动画效果。 默认为true
+
 	$.each($_menus.menus, function(key, val) {
-		var menulist ='';
-		menulist +='<ul>';
-        $.each(val.menus, function(key2, val2) {
-			menulist += '<li><div>'+
-				'<a ref="' + val2.id + '" href="#" rel="' + val2.url + '" class="menuToFrame" >'+
-					'<span class="icon '+val2.icon+'" >&nbsp;</span>'+
-					'<span class="nav">' + val2.name + '</span>'+
-				'</a></div></li> ';
-        });
+		// menulist：内部的菜单列表
+		var menulist = '';
+		menulist += '<ul>';
+
+		if (val.hasOwnProperty("menus")) {
+			$.each(val.menus, function(key2, val2) {
+				menulist += '<li><div>' + '<a ref="' + val2.id
+						+ '" href="#" rel="' + val2.url + actionExtension
+						+ '" class="menuToFrame" >' + '<span class="icon '
+						+ val2.icon + '" >&nbsp;</span>' + '<span class="nav">'
+						+ val2.name + '</span>' + '</a></div></li> ';
+			});
+		}
+
 		menulist += '</ul>';
 
+		// 添加最外层的菜单列表
 		$('#nav').accordion('add', {
-            title: val.name,
-            content: menulist,
-            iconCls: 'icon ' + val.icon
-        });
-		
-    });
-	
+			title : val.name,
+			content : menulist,
+			iconCls : 'icon ' + val.icon
+		});
+
+	});
+
 	/**
-	 * easyui 的bug，这里还要加一个空的accordion，
-	 * 不然最后一个accordion里面的菜单，点击后没有反应。。。
+	 * easyui 的bug，这里还要加一个空的accordion， 不然最后一个accordion里面的菜单，点击后没有反应。。。
 	 * 尼玛，调试了一下午，给他跪了。。。
 	 */
-	$('#nav').accordion('add', {
-    });
+	$('#nav').accordion('add', {});
 
-	//点击左侧的菜单，在右边显示页面
-	$('.easyui-accordion li a').click(function(){
+	// 点击左侧的菜单，在右边显示页面
+	$('.easyui-accordion li a').click(function() {
 		var tabTitle = $(this).children('.nav').text();
 
 		var url = $(this).attr("rel");
 		var menuid = $(this).attr("ref");
-		var icon = getIcon(menuid);//获取左侧导航的图标
-		
-		addTab(tabTitle,url,icon);
+		var icon = getIcon(menuid);// 获取左侧导航的图标
+
+		addTab(tabTitle, url, icon);
 		$('.easyui-accordion li div').removeClass("selected");
 		$(this).parent().addClass("selected");
-	}).hover(function(){
+	}).hover(function() {
 		$(this).parent().addClass("hover");
-	},function(){
+	}, function() {
 		$(this).parent().removeClass("hover");
 	});
 
-	//选中第一个
+	// 选中第一个
 	var panels = $('#nav').accordion('panels');
 	var t = panels[0].panel('options').title;
-    $('#nav').accordion('select', t);
+	$('#nav').accordion('select', t);
 }
 
-//初始化右侧欢迎页面
+// 初始化右侧欢迎页面
 function InitRightMenu() {
-	var url="";
+	var url = "";
 	$.each($_menus.menus, function(key, val) {
-		var menulist ='';		
-        $.each(val.menus, function(key1, val2) {
-        	if(key==0 && key1==0)
-        		url = val2.url;
-        });
+		var menulist = '';
+
+		/**
+		 * 尼玛，这里也有对内层数据的遍历，内层数据也可能没有 menus属性， 所以这里也要判断val是否有menus属性
+		 * 你大爷的，调试了几个小时，最后是这里出错，狂徒一吨血。。。。
+		 */
+		if (val.hasOwnProperty("menus")) {
+			$.each(val.menus, function(key1, val2) {
+				if (key == 0 && key1 == 0)
+					url = val2.url;
+			});
+		}
 	});
-	$("#content_frame").attr('src','home_welcome.action');
+	$("#content_frame").attr('src', 'home_welcome.action');
 }
 
-//获取左侧导航的图标
-function getIcon(menuid){
+// 获取左侧导航的图标
+function getIcon(menuid) {
 	var icon = 'icon ';
 	$.each($_menus.menus, function(key, val) {
-		$.each(val.menus, function(key1, val2) {
-			if(val2.id==menuid){
-				icon += val2.icon;
-			}
-		});
+		if (val.hasOwnProperty("menus")) {
+			$.each(val.menus, function(key1, val2) {
+				if (val2.id == menuid) {
+					icon += val2.icon;
+				}
+			});
+		}
 	});
 
 	return icon;
 }
 
-function addTab(subtitle,url,icon){
-	if(!$('#tabs').tabs('exists',subtitle)){
-		$('#tabs').tabs('add',{
-			title:subtitle,
-			content:createFrame(url),
-			closable:true,
-			icon:icon
+function addTab(subtitle, url, icon) {
+	if (!$('#tabs').tabs('exists', subtitle)) {
+		$('#tabs').tabs('add', {
+			title : subtitle,
+			content : createFrame(url),
+			closable : true,
+			icon : icon
 		});
-	}else{
-		$('#tabs').tabs('select',subtitle);
+	} else {
+		$('#tabs').tabs('select', subtitle);
 		$('#mm-tabupdate').click();
 	}
 	tabClose();
 }
 
-function createFrame(url)
-{
-	var s = '<iframe scrolling="auto" frameborder="0"  src="'+url+
-		'" style="width:100%;height:100%;"></iframe>';
+function createFrame(url) {
+	var s = '<iframe scrolling="auto" frameborder="0"  src="' + url
+			+ '" style="width:100%;height:100%;"></iframe>';
 	return s;
 }
 
-function tabClose()
-{
-	/*双击关闭TAB选项卡*/
-	$(".tabs-inner").dblclick(function(){
+function tabClose() {
+	/* 双击关闭TAB选项卡 */
+	$(".tabs-inner").dblclick(function() {
 		var subtitle = $(this).children(".tabs-closable").text();
-		$('#tabs').tabs('close',subtitle);
+		$('#tabs').tabs('close', subtitle);
 	});
-	/*为选项卡绑定右键*/
-	$(".tabs-inner").bind('contextmenu',function(e){
+	/* 为选项卡绑定右键 */
+	$(".tabs-inner").bind('contextmenu', function(e) {
 		$('#mm').menu('show', {
-			left: e.pageX,
-			top: e.pageY
+			left : e.pageX,
+			top : e.pageY
 		});
 
-		var subtitle =$(this).children(".tabs-closable").text();
+		var subtitle = $(this).children(".tabs-closable").text();
 
-		$('#mm').data("currtab",subtitle);
-		$('#tabs').tabs('select',subtitle);
+		$('#mm').data("currtab", subtitle);
+		$('#tabs').tabs('select', subtitle);
 		return false;
 	});
 }
-//绑定右键菜单事件
-function tabCloseEven()
-{
-	//刷新
-	$('#mm-tabupdate').click(function(){
+// 绑定右键菜单事件
+function tabCloseEven() {
+	// 刷新
+	$('#mm-tabupdate').click(function() {
 		var currTab = $('#tabs').tabs('getSelected');
 		var url = $(currTab.panel('options').content).attr('src');
-		$('#tabs').tabs('update',{
-			tab:currTab,
-			options:{
-				content:createFrame(url)
+		$('#tabs').tabs('update', {
+			tab : currTab,
+			options : {
+				content : createFrame(url)
 			}
 		});
 	});
-	//关闭当前
-	$('#mm-tabclose').click(function(){
+	// 关闭当前
+	$('#mm-tabclose').click(function() {
 		var currtab_title = $('#mm').data("currtab");
-		$('#tabs').tabs('close',currtab_title);
+		$('#tabs').tabs('close', currtab_title);
 	});
-	//全部关闭
-	$('#mm-tabcloseall').click(function(){
-		$('.tabs-inner span').each(function(key,val){
+	// 全部关闭
+	$('#mm-tabcloseall').click(function() {
+		$('.tabs-inner span').each(function(key, val) {
 			var t = $(val).text();
-			$('#tabs').tabs('close',t);
+			$('#tabs').tabs('close', t);
 		});
 	});
-	//关闭除当前之外的TAB
-	$('#mm-tabcloseother').click(function(){
+	// 关闭除当前之外的TAB
+	$('#mm-tabcloseother').click(function() {
 		$('#mm-tabcloseright').click();
 		$('#mm-tabcloseleft').click();
 	});
-	//关闭当前右侧的TAB
-	$('#mm-tabcloseright').click(function(){
+	// 关闭当前右侧的TAB
+	$('#mm-tabcloseright').click(function() {
 		var nextall = $('.tabs-selected').nextAll();
-		if(nextall.length==0){
-			msgShow('系统提示','后边没有啦~~','warning');
-			//alert('后边没有啦~~');
+		if (nextall.length == 0) {
+			msgShow('系统提示', '后边没有啦~~', 'warning');
+			// alert('后边没有啦~~');
 			return false;
 		}
-		nextall.each(function(key,val){
-			var t=$('a:eq(0) span',$(val)).text();
-			$('#tabs').tabs('close',t);
+		nextall.each(function(key, val) {
+			var t = $('a:eq(0) span', $(val)).text();
+			$('#tabs').tabs('close', t);
 		});
 		return false;
 	});
-	//关闭当前左侧的TAB
-	$('#mm-tabcloseleft').click(function(){
+	// 关闭当前左侧的TAB
+	$('#mm-tabcloseleft').click(function() {
 		var prevall = $('.tabs-selected').prevAll();
-		if(prevall.length==0){
+		if (prevall.length == 0) {
 			alert('到头了，前边没有啦~~');
 			return false;
 		}
-		prevall.each(function(key,val){
-			var t=$('a:eq(0) span',$(val)).text();
-			$('#tabs').tabs('close',t);
+		prevall.each(function(key, val) {
+			var t = $('a:eq(0) span', $(val)).text();
+			$('#tabs').tabs('close', t);
 		});
 		return false;
 	});
 
-	//退出
-	$("#mm-exit").click(function(){
+	// 退出
+	$("#mm-exit").click(function() {
 		$('#mm').menu('hide');
 	});
 }
 
-//弹出信息窗口 title:标题 msgString:提示信息 msgType:信息类型 [error,info,question,warning]
+// 弹出信息窗口 title:标题 msgString:提示信息 msgType:信息类型 [error,info,question,warning]
 function msgShow(title, msgString, msgType) {
 	$.messager.alert(title, msgString, msgType);
 }
 
 /*
-//最原始的 获得 $_menu 的请求
-function getMenu() {   
-	  
-	tabClose();
-	tabCloseEven();
-    var xhr = getXMLHttpRequest();   
-    var responseContext=""; 
-
- 
-    xhr.open("POST", "userMenuAction", true);   
-  
-    xhr.send();   
- 
-    xhr.onreadystatechange = function() {   //回调函数
- 
-       if (xhr.readyState == 4 && xhr.status == 200) {   
-  
-           responseContext = xhr.responseText; 
-           _menus = eval("("+responseContext+")");//responseContext;
-           InitLeftMenu();//左边的用户菜单
-           InitRightMenu();//右边的欢迎页面
-           $("#pageloading").hide();
-       	   
-       }   
-  
-    }   
-  return responseContext;
-}   
-*/
+ * //最原始的 获得 $_menu 的请求 function getMenu() {
+ * 
+ * tabClose(); tabCloseEven(); var xhr = getXMLHttpRequest(); var
+ * responseContext="";
+ * 
+ * 
+ * xhr.open("POST", "userMenuAction", true);
+ * 
+ * xhr.send();
+ * 
+ * xhr.onreadystatechange = function() { //回调函数
+ * 
+ * if (xhr.readyState == 4 && xhr.status == 200) {
+ * 
+ * responseContext = xhr.responseText; _menus =
+ * eval("("+responseContext+")");//responseContext; InitLeftMenu();//左边的用户菜单
+ * InitRightMenu();//右边的欢迎页面 $("#pageloading").hide();
+ *  }
+ *  } return responseContext; }
+ */

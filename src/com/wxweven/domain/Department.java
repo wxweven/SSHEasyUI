@@ -29,7 +29,6 @@ public class Department implements java.io.Serializable {
 	private Set<User> users = new HashSet<User>();// 部门关联的用户 User，一对多关系
 	private Department parent;// 部门的父部门Department，多对一关系
 	private Set<Department> children = new HashSet<Department>();// 部门的子部门Department，一对多关系
-	private Set<SysMenu> sysMenus = new HashSet<SysMenu>();//部门关联的菜单，多对多
 	
 	/**
 	 * getters and setters
@@ -112,14 +111,6 @@ public class Department implements java.io.Serializable {
 
 	public void setChildren(Set<Department> children) {
 		this.children = children;
-	}
-
-	public Set<SysMenu> getSysMenus() {
-		return sysMenus;
-	}
-
-	public void setSysMenus(Set<SysMenu> sysMenus) {
-		this.sysMenus = sysMenus;
 	}
 
 	@Override

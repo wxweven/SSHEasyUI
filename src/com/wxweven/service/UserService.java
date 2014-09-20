@@ -15,13 +15,13 @@ public interface UserService extends BaseService<User> {
 	 */
 	User findByLoginNameAndPassword(String loginName, String password);
 
-	/**
-	 * 根据登录的用户 user，来获得该 user 的菜单
-	 * 
-	 * @param user
-	 * @return
-	 */
-	String getUserMenu(User user);
+//	/**
+//	 * 根据登录的用户 user，来获得该 user 的菜单
+//	 * 
+//	 * @param user
+//	 * @return
+//	 */
+//	String getUserMenu(User user);
 	
 	/**
 	 * 

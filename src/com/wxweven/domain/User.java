@@ -5,10 +5,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.opensymphony.xwork2.ActionContext;
+import com.wxweven.utils.BasicPriv;
 
 /**
- * 
  * @author wxweven
  * @date 2014年8月23日
  * @version 1.0
@@ -22,10 +23,10 @@ public class User implements java.io.Serializable {
 
 	// 用户的基本信息
 	private Integer id;// 用户id，用Integer类，而不要用 int类型
-	
+
 	private String loginName; // 登录名
 	private String password; // 密码
-	
+
 	private String userState; // 用户状态是否可用
 	private Date lastLoginTime;// 用户最后登录的时间
 	private String realName; // 真实姓名
@@ -36,81 +37,83 @@ public class User implements java.io.Serializable {
 
 	// 用户的关联信息
 	private Department department;// 用户所属的部门，多对一关系（多个 User 属于一个 Department ）
-	private UserGroup userGroup;// 用户所属的用户组，多对一关系（多个 User 属于一个 UserGroup ）
-	// private Set<Department> roles = new HashSet<Department>();//用户的角色，一对多关系
-	// （一个 User 有多个角色 Department）
-
+	private Set<Role> roles = new HashSet<Role>();// 用户的角色，一对多关系
+	
 	/**
-	 * 判断本用户是否有指定名称的权限
+	 * 判断本用户是否有指定名称的菜单权限
 	 * 
 	 * @param name
 	 * @return
 	 */
-	// public boolean hasPrivilegeByName(String name) {
-	// // 超级管理有所有的权限
-	// if (isAdmin()) {
-	// return true;
-	// }
-	//
-	// // 普通用户要判断是否含有这个权限
-	// for (Department role : roles) {
-	// for (Privilege priv : role.getPrivileges()) {
-	// if (priv.getName().equals(name)) {
-	// return true;
-	// }
-	// }
-	// }
-	// return false;
-	// }
+	public boolean hasSysMenuByName(String name) {
+		// 超级管理有所有的权限
+		if (isAdmin()) {
+			return true;
+		}
+
+		// 普通用户要判断是否含有这个权限
+		for (Role role : roles) {
+			for (SysMenu sysmenu : role.getSysMenus()) {
+				if (sysmenu.getName().equals(name)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	
+//	public boolean hasPrivilegeByUrl(String privUrl) {
+//		// 超级管理有所有的权限
+//		if (isAdmin()) {
+//			return true;
+//		}
+//		return true;
+//	}
 
 	/**
-	 * 判断本用户是否有指定URL的权限
+	 * 判断本用户是否有指定URL的菜单权限
 	 * 
-	 * @param privUrl
-	 * @return 占位符，默认这里所有权限判断都返回true
+	 * @param sysMenuUrl
 	 */
-	public boolean hasPrivilegeByUrl(String privUrl) {
-		 // 超级管理有所有的权限
-		 if (isAdmin()) {
+	public boolean hasSysMenuByUrl(String sysMenuUrl, String namespace) {
+		// 超级管理有所有的权限
+		if (isAdmin()) {
 			return true;
-		 }
-		 // TODO 要对权限做判断
-		 return true;
+		}
+		
+		if(BasicPriv.getBasicPrivList().contains(sysMenuUrl)) {
+			return true;
+		}
+
+		// >> 去掉后面的参数
+		int pos = sysMenuUrl.indexOf("?");
+		if (pos > -1) {
+			sysMenuUrl = sysMenuUrl.substring(0, pos);
+		}
+		// >> 去掉UI后缀
+		if (sysMenuUrl.endsWith("UI")) {
+			sysMenuUrl = sysMenuUrl.substring(0, sysMenuUrl.length() - 2);
+		}
+
+//		// 得到所有的需要登录的urls
+//		Collection<String> allPrivilegeUrls = (Collection<String>) ActionContext.getContext().getApplication()
+//				.get("allPrivilegeUrls");
+//		
+//		if (!allPrivilegeUrls.contains(sysMenuUrl)) {
+//			return true;
+//		} else {
+			// 普通用户要判断是否含有这个权限
+			for (Role role : roles) {
+				for (SysMenu sysMenu : role.getSysMenus()) {
+					if (sysMenuUrl.equals(namespace + sysMenu.getUrl())) {
+						return true;
+					}
+				}
+			}
+			return false;
+//		}
 	}
-	
-	// public boolean hasPrivilegeByUrl(String privUrl) {
-	// // 超级管理有所有的权限
-	// if (isAdmin()) {
-	// return true;
-	// }
-	//
-	// // >> 去掉后面的参数
-	// int pos = privUrl.indexOf("?");
-	// if (pos > -1) {
-	// privUrl = privUrl.substring(0, pos);
-	// }
-	// // >> 去掉UI后缀
-	// if (privUrl.endsWith("UI")) {
-	// privUrl = privUrl.substring(0, privUrl.length() - 2);
-	// }
-	//
-	// // 如果本URL不需要控制，则登录用户就可以使用
-	// Collection<String> allPrivilegeUrls = (Collection<String>)
-	// ActionContext.getContext().getApplication().get("allPrivilegeUrls");
-	// if (!allPrivilegeUrls.contains(privUrl)) {
-	// return true;
-	// } else {
-	// // 普通用户要判断是否含有这个权限
-	// for (Department role : roles) {
-	// for (Privilege priv : role.getPrivileges()) {
-	// if (privUrl.equals(priv.getUrl())) {
-	// return true;
-	// }
-	// }
-	// }
-	// return false;
-	// }
-	// }
 
 	/**
 	 * 判断本用户是否是超级管理员
@@ -121,8 +124,7 @@ public class User implements java.io.Serializable {
 		return "admin".equals(loginName);
 	}
 
-	//=====getters and setters
-	
+	// =====getters and setters
 	public Integer getId() {
 		return id;
 	}
@@ -155,6 +157,7 @@ public class User implements java.io.Serializable {
 		this.userState = userState;
 	}
 
+	@JSONField(format="yyyy-MM-dd HH:mm:ss")  
 	public Date getLastLoginTime() {
 		return lastLoginTime;
 	}
@@ -211,20 +214,17 @@ public class User implements java.io.Serializable {
 		this.department = department;
 	}
 
-	public UserGroup getUserGroup() {
-		return userGroup;
+	public Set<Role> getRoles() {
+		return roles;
 	}
 
-	public void setUserGroup(UserGroup userGroup) {
-		this.userGroup = userGroup;
+	public void setRoles(Set<Role> roles) {
+		this.roles = roles;
 	}
 
-	//========
+	// ========toString
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", loginName=" + loginName + ", password=" + password + ", userState=" + userState
-				+ ", lastLoginTime=" + lastLoginTime + ", realName=" + realName + ", gender=" + gender
-				+ ", phoneNumber=" + phoneNumber + ", email=" + email + ", description=" + description + "]";
+		return "User [id=" + id + ", loginName=" + loginName + ", realName=" + realName + "]";
 	}
-
 }

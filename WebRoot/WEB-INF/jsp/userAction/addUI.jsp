@@ -11,6 +11,8 @@
 				<td>
 					<input class="easyui-validatebox" type="text" id="loginName" name="loginName"
 						data-options="required:true, validType:'loginName', delay:800"/>
+					<!-- <input class="easyui-validatebox" type="text" id="loginName" name="loginName"
+						data-options="required:true"/> -->
 				</td>
 				
 				<th><label for="realName">真实姓名：</label></th>
@@ -32,11 +34,10 @@
 			
 			<tr>	
 				<th><label for="departmentId">所属部门：</label></th>
-				<td><input class="easyui-validatebox" type="text" id="departmentId" name="departmentId" /></td>
+				<td><input class="easyui-textbox" type="text" id="departmentId" name="departmentId" /></td>
 				
-				<!-- <th><label for="userGroupId">所属用户组：</label></th>
-				<td><input class="easyui-validatebox" type="text" id="userGroupId" name="userGroupId"
-					 required="true" /></td> -->
+				<th><label for="roleIds">角色：</label></th>
+				<td><input class="easyui-textbox" type="text" id="roleIds" name="roleIds" /></td>
 			</tr>
 			
 			<tr>
@@ -91,15 +92,24 @@
 $(function(){
 	//用户所属部门下拉框：获取所有的部门
 	$('#departmentId').combotree({
-	    url:'department_getDepartmentTree.action',
+	    url:'department_getDepartmentTree'+actionExtension,
 	    valueField: 'id',
         textField: 'text',
 	    required: true
 	});
 	
+	//用户角色下拉框：获取所有的角色
+	$('#roleIds').combobox({
+	    url:'role_getRoleList' + actionExtension,
+	    valueField:'id',
+	    textField:'text',
+	    multiple:true
+	});
+	
 });
 
 function submitForm() {
+	console.log(111);
 	$('#ffAdd').form('submit', {
 		url: 'user_add.action',//指定提交的url
 		onSubmit : function() {

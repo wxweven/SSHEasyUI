@@ -30,7 +30,7 @@ public class SysMenu implements java.io.Serializable {
 	private SysMenu parent;// 父菜单, 多对一
 	private Set<SysMenu> children = new HashSet<SysMenu>();// 子菜单，一对多
 
-	private Set<Department> menuDepts = new HashSet<Department>();// 菜单所属的部门，多对多
+	private Set<Role> roles = new HashSet<Role>(); // 菜单关联的角色，多对多
 
 	
 	// ========getters and setters
@@ -107,18 +107,17 @@ public class SysMenu implements java.io.Serializable {
 		this.children = children;
 	}
 
-	public Set<Department> getMenuDepts() {
-		return menuDepts;
+	public Set<Role> getRoles() {
+		return roles;
 	}
 
-	public void setMenuDepts(Set<Department> menuDepts) {
-		this.menuDepts = menuDepts;
+	public void setRoles(Set<Role> roles) {
+		this.roles = roles;
 	}
 
 	@Override
 	public String toString() {
-		return "SysMenu [id=" + id + ", name=" + name + ", icon=" + icon + ", url=" + url + ", level=" + level
-				+ ", description=" + description + ", orderNum=" + orderNum + "]";
+		return "[id=" + id + ", name=" + name + ", url=" + url + "]";
 	}
 
 	

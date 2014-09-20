@@ -5,7 +5,7 @@
 
 <hibernate-mapping package="com.wxweven.domain">
 
-	<class name="SysMenu" table="wxw_sys_menu">
+	<class name="SysMenu" table="wxw_sysmenu">
 		<id name="id">
 			<generator class="assigned" />
 		</id>
@@ -30,10 +30,10 @@
 			<one-to-many class="SysMenu" />
 		</set>
 		
-		<!-- menuDepts属性，本类与Department的多对多 -->
-		<set name="menuDepts" table="wxw_menu_dept">
+		<!-- roles属性，本类与Role的多对多 -->
+		<set name="roles" table="wxw_menu_role">
 			<key column="menuId"></key>
-			<many-to-many class="Department" column="deptId"></many-to-many>
+			<many-to-many class="Role" column="roleId"></many-to-many>
 		</set>
 
 	</class>

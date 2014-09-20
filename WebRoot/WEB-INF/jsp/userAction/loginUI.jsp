@@ -15,6 +15,8 @@
 
 	$(function(){
 		document.forms[0].loginName.focus();
+		//var tt = "${application.actionExtension}";
+		//console.log(tt);
 	});
 	
 	// 在被嵌套时就刷新上级窗口
@@ -38,7 +40,7 @@
 	<div id="content">
 		<div class="left_main">
 			<ul class="news" style="color:#FFFFFF;">
-				<li><font size="4"><%=application.getInitParameter("webAppName") %></font></li>
+				<li><font size="4">${application.webAppName }</font></li>
 			</ul>
 		</div>
 		<form id="form1" method="post" action = "user_login">
