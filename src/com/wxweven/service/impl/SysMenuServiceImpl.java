@@ -11,6 +11,7 @@ import com.wxweven.base.BaseServiceImpl;
 import com.wxweven.domain.Department;
 import com.wxweven.domain.SysMenu;
 import com.wxweven.domain.User;
+import com.wxweven.service.DepartmentService;
 import com.wxweven.service.SysMenuService;
 
 /**

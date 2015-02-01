@@ -22,8 +22,10 @@ function getMenu() {
 		success : function(data) {
 			// console.log(data);
 			// $_menus = data;
-			$_menus = eval("(" + data + ")");
-			InitLeftMenu();// 左边的用户菜单
+//			$_menus = eval("(" + data + ")");
+			$_menus = $.parseJSON(data);
+			
+			InitLeftMenu($_menus.menus);// 左边的用户菜单
 			InitRightMenu();// 右边的欢迎页面
 
 			$("#pageloading").hide();
@@ -41,7 +43,7 @@ function InitLeftMenu() {
 		var menulist = '';
 		menulist += '<ul>';
 
-		if (val.hasOwnProperty("menus")) {
+		if (val.hasOwnProperty("menus")) {//说明还有子菜单
 			$.each(val.menus, function(key2, val2) {
 				menulist += '<li><div>' + '<a ref="' + val2.id
 						+ '" href="#" rel="' + val2.url + actionExtension

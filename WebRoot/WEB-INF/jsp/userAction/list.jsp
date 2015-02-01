@@ -186,7 +186,7 @@
 	    			$.each($checkedRows, function(key, val) {
 	    				deleteIds[key] = val.id;
 	    			});
-	    			console.log(deleteIds);
+	    			
 	        		var postData = {'deletIds': deleteIds};
 	        		//ajax 请求删除选中的行
 	    			$.ajax({
@@ -267,16 +267,6 @@
 	   		});//end of confirm
 		}//end of else
 	}//end of deleteUser
-	
-	//导出Excel
-	function exportUser(){
-		//ajax 请求导出Excel
-		console.log("11111111");
-		$.ajax({
-			url: 'user_export.action',
-			type: 'POST'
-		});//end of $.ajax
-	}
 	
 </script>
 

@@ -500,4 +500,19 @@ public class UserAction extends BaseAction<User> {
 	public void setInitPasswdIds(Integer[] initPasswdIds) {
 		this.initPasswdIds = initPasswdIds;
 	}
+
+	//====toString
+	@Override
+	public String toString() {
+		return "UserAction [returnMesg=" + returnMesg + ", usercaptcha="
+				+ usercaptcha + ", newPass=" + newPass + ", departmentId="
+				+ departmentId + ", roleIds=" + Arrays.toString(roleIds)
+				+ ", deletIds=" + Arrays.toString(deletIds)
+				+ ", initPasswdIds=" + Arrays.toString(initPasswdIds)
+				+ ", page=" + page + ", rows=" + rows + ", sort=" + sort
+				+ ", order=" + order + "]";
+	}
+	
+
+	
 }
