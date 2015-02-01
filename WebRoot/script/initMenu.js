@@ -22,6 +22,7 @@ function getMenu() {
 		success : function(data) {
 			// console.log(data);
 			// $_menus = data;
+
 			try{
 				$_menus = $.parseJSON(data);
 				InitLeftMenu();// 左边的用户菜单
@@ -30,6 +31,7 @@ function getMenu() {
 			}catch(e){
 				console.log(e.name + ": " + e.message);
 			}
+
 		}
 	});
 
@@ -44,9 +46,11 @@ function InitLeftMenu() {
 		var menulist = '';
 		var min_menulist = '';
 		menulist += '<ul>';
+
 		var listNum='';
-		if (val.hasOwnProperty("menus")) {
+		if (val.hasOwnProperty("menus")) {//说明还有子菜单
 			
+
 			$.each(val.menus, function(key2, val2) {
 				if(val2.menus){
 					var thirdNum=key2;

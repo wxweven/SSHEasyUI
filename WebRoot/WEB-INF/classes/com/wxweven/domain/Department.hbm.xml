@@ -21,7 +21,7 @@
 			<key column="departmentId" />
 			<one-to-many class="User" />
 		</set>
-
+		
 		<!-- parent属性，本类与Department（上级）的多对一 -->
 		<many-to-one name="parent" class="Department" column="parentId" cascade="save-update" />
 
