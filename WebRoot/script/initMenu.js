@@ -22,11 +22,14 @@ function getMenu() {
 		success : function(data) {
 			// console.log(data);
 			// $_menus = data;
-			$_menus = eval("(" + data + ")");
-			InitLeftMenu();// 左边的用户菜单
-			InitRightMenu();// 右边的欢迎页面
-
-			$("#pageloading").hide();
+			try{
+				$_menus = $.parseJSON(data);
+				InitLeftMenu();// 左边的用户菜单
+				InitRightMenu();// 右边的欢迎页面
+				$("#pageloading").hide();
+			}catch(e){
+				console.log(e.name + ": " + e.message);
+			}
 		}
 	});
 
@@ -35,21 +38,69 @@ function getMenu() {
 // 初始化左侧 菜单显示
 function InitLeftMenu() {
 	// $("#nav").accordion({animate:true});//定义当延伸或者折叠面板时是否显示动画效果。 默认为true
-
+	var array=[];
 	$.each($_menus.menus, function(key, val) {
 		// menulist：内部的菜单列表
 		var menulist = '';
+		var min_menulist = '';
 		menulist += '<ul>';
-
+		var listNum='';
 		if (val.hasOwnProperty("menus")) {
+			
 			$.each(val.menus, function(key2, val2) {
-				menulist += '<li><div>' + '<a ref="' + val2.id
+				if(val2.menus){
+					var thirdNum=key2;
+				}
+				/*代表含有三级菜单*/
+				if(key2==thirdNum){
+					var thirdMenu=val2.menus;
+					var thirdMenuLength=thirdMenu.length;
+					var thirdStr="<ul>";
+					for(var z=0;z<thirdMenuLength;z++){
+						/*代表有四级菜单*/
+						if(thirdMenu[z].menus){
+							var fourNum=z;
+							var fourMenu=thirdMenu[z].menus;
+							var fourLength=fourMenu.length;
+							var fourStr="<ul>";
+							for(var j=0;j<fourLength;j++){
+								fourStr+="<li style='padding:4px 0px;'>"+'<span class="icon '
+								+ val2.icon + '" >&nbsp;</span>' + '<span class="nav">'
+								+fourMenu[j].name+ '</span>'+"</li>"
+							}
+							fourStr+="</ul>";
+							//console.log(fourStr);
+							thirdStr+="<li style='padding:4px 0px;'>"+'<span class="icon '
+							+ val2.icon + '" >&nbsp;</span>' + '<span class="nav">'
+							+thirdMenu[z].name+ '</span>'+fourStr+"</li>";
+						}else{
+							thirdStr+="<li style='padding:4px 0px;'>"+'<span class="icon '
+							+ val2.icon + '" >&nbsp;</span>' + '<span class="nav">'
+							+thirdMenu[z].name+ '</span>'+"</li>";	
+						}					
+						
+					}
+					thirdStr+="</ul>";
+					menulist += '<li><div>' + '<a ref="' + val2.id
 						+ '" href="#" rel="' + val2.url + actionExtension
 						+ '" class="menuToFrame" >' + '<span class="icon '
 						+ val2.icon + '" >&nbsp;</span>' + '<span class="nav">'
-						+ val2.name + '</span>' + '</a></div></li> ';
+						+ val2.name + '</span>' + '</a>'+thirdStr+'</div></li> '
+				}else{
+					menulist += '<li><div>' + '<a ref="' + val2.id
+					+ '" href="#" rel="' + val2.url + actionExtension
+					+ '" class="menuToFrame" >' + '<span class="icon '
+					+ val2.icon + '" >&nbsp;</span>' + '<span class="nav">'
+					+ val2.name + '</span>' + '</a>'+'</div></li> ';
+				}
+				
+				
+					
+				
 			});
 		}
+		
+		
 
 		menulist += '</ul>';
 

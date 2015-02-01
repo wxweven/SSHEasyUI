@@ -61,11 +61,13 @@
               	</td>
           	</tr>
           	
+          	
 		</table>
 	</form>
 	
 </div>
-
+<s:debug>
+</s:debug>
 <script type="text/javascript">
 $(function(){
 	//用户所属部门下拉框：获取所有的部门

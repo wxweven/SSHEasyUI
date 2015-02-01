@@ -98,7 +98,7 @@
 				{field : 'realName', title : '真实姓名', width : 80, sortable : true,
 					formatter: function(value,row,index){
 						//return "<a href='"+value+"' tartget='_top'>"+value+"</a>";
-						return "<a href='http://www.baidu.com/s?wd="+value+"' tartget='_top'>"+value+"</a>";
+						return "<a href='http://www.baidu.com/s?wd="+value+"' target='_top'>"+value+"</a>";
 						
 					}
 				},
@@ -186,7 +186,7 @@
 	    			$.each($checkedRows, function(key, val) {
 	    				deleteIds[key] = val.id;
 	    			});
-	    			console.log(deleteIds);
+	    			//console.log(deleteIds);
 	        		var postData = {'deletIds': deleteIds};
 	        		//ajax 请求删除选中的行
 	    			$.ajax({

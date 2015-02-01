@@ -129,11 +129,11 @@ function changPasswd() {
 			background: url('${pageContext.request.contextPath}/style/images/top.jpg')  repeat-x 100% bottom; 
 			line-height: 20px; color: #fff; font-family: Verdana, 微软雅黑, 黑体">
 
-		<span style="float: right; padding-right: 20px;" align="absmiddle" class="head">
-			欢迎<%-- <userName:userName></userName:userName> --%>登陆
-			<a href="#" id="editpass">修改密码</a> 
-			<a href="#" id="loginOut">安全退出</a> 
-			<a href="#" id="help">帮助</a>
+		<span style="float: right; padding-right: 20px;padding-top:16px;" align="absmiddle" class="head">
+			<a href="#" style="padding:0 4px;font-size:14px;text-decoration:none;">欢迎<%-- <userName:userName></userName:userName> --%>登陆</a>
+			<a href="#" id="editpass" style="padding:0 4px;font-size:14px;">修改密码</a> 
+			<a href="#" id="loginOut" style="padding:0 4px;font-size:14px;">安全退出</a> 
+			<a href="#" id="help" style="padding:0 4px;font-size:14px;">帮助</a>
 		</span> 
 		
 		<span style="padding-left: 10px; font-size: 16px;">
